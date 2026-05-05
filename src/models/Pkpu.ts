@@ -13,7 +13,7 @@ const pkpuSchema = new Schema(
     judul: { type: String, required: true, trim: true },
     slug: { type: String, required: true, unique: true, lowercase: true, trim: true },
     tanggalPenetapan: { type: Date, required: true },
-    statusHukum: { type: String, enum: ["induk", "revisi"], required: true },
+    statusHukum: { type: String, enum: ["berlaku", "revisi", "dicabut"], required: true },
     kategori: { type: Schema.Types.ObjectId, ref: "Kategori", required: true },
     fileUrl: { type: String, required: true },
     parentId: { type: Schema.Types.ObjectId, ref: "Pkpu", default: null },

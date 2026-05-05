@@ -54,20 +54,20 @@ export async function POST(request: Request) {
     return jsonError("Kategori tidak ditemukan.", 404);
   }
 
-  if (payload.statusHukum === "revisi") {
+  if (payload.statusHukum === "revisi" || payload.statusHukum === "dicabut") {
     if (!payload.parentId || !Types.ObjectId.isValid(payload.parentId)) {
       return jsonError("Parent PKPU tidak valid.", 400);
     }
     const parentExists = await PkpuModel.exists({
       _id: payload.parentId,
-      statusHukum: "induk",
+      statusHukum: { $in: ["berlaku", "induk"] },
     });
     if (!parentExists) {
-      return jsonError("Parent PKPU induk tidak ditemukan.", 404);
+      return jsonError("Parent PKPU berlaku tidak ditemukan.", 404);
     }
   }
 
-  if (payload.statusHukum === "induk") {
+  if (payload.statusHukum === "berlaku") {
     payload.parentId = null;
   }
 

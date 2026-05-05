@@ -7,7 +7,7 @@ export default async function AdminPkpuCreatePage() {
   await connectDb();
   const [kategoriOptions, indukOptions] = await Promise.all([
     KategoriModel.find().sort({ nama: 1 }).select("_id nama").lean(),
-    PkpuModel.find({ statusHukum: "induk" }).sort({ tahun: -1, nomor: -1 }).select("_id nomor tahun judul").lean(),
+    PkpuModel.find({ statusHukum: { $in: ["berlaku", "induk"] } }).sort({ tahun: -1, nomor: -1 }).select("_id nomor tahun judul").lean(),
   ]);
 
   return (

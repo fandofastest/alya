@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -13,7 +14,7 @@ export default async function PkpuDetailPage(props: { params: Promise<{ slug: st
   if (!pkpu) return notFound();
 
   const revisiList =
-    pkpu.statusHukum === "induk" ? await getRevisiListByParent(pkpu._id.toString()) : [];
+    pkpu.statusHukum === "berlaku" || pkpu.statusHukum === "induk" ? await getRevisiListByParent(pkpu._id.toString()) : [];
 
   return (
     <div className="space-y-6">
@@ -39,19 +40,24 @@ export default async function PkpuDetailPage(props: { params: Promise<{ slug: st
               : "-"}
           </p>
         </div>
-        {pkpu.statusHukum === "revisi" &&
+        {(pkpu.statusHukum === "revisi" || pkpu.statusHukum === "dicabut") &&
         pkpu.parentId &&
         typeof pkpu.parentId === "object" &&
         "nomor" in pkpu.parentId &&
         "tahun" in pkpu.parentId ? (
-          <p className="mt-4 rounded bg-amber-50 px-3 py-2 text-sm text-amber-900">
-            Revisi dari PKPU No {(pkpu.parentId as { nomor: number }).nomor} Tahun{" "}
-            {(pkpu.parentId as { tahun: number }).tahun}
+          <p
+            className={clsx(
+              "mt-4 rounded px-3 py-2 text-sm",
+              pkpu.statusHukum === "revisi" ? "bg-amber-50 text-amber-900" : "bg-rose-50 text-rose-900"
+            )}
+          >
+            {pkpu.statusHukum === "revisi" ? "Revisi dari" : "Mencabut"} PKPU No{" "}
+            {(pkpu.parentId as { nomor: number }).nomor} Tahun {(pkpu.parentId as { tahun: number }).tahun}
           </p>
         ) : null}
-        {pkpu.statusHukum === "induk" && revisiList.length > 0 ? (
+        {(pkpu.statusHukum === "berlaku" || pkpu.statusHukum === "induk") && revisiList.length > 0 ? (
           <div className="mt-4 rounded bg-blue-50 px-4 py-3">
-            <p className="text-sm font-semibold text-[#1E3A8A]">Daftar Revisi:</p>
+            <p className="text-sm font-semibold text-[#1E3A8A]">Daftar Revisi/Pencabutan:</p>
             <ul className="mt-2 space-y-1 text-sm">
               {revisiList.map((item) => (
                 <li key={item._id.toString()}>

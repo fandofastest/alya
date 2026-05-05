@@ -11,7 +11,7 @@ import { PkpuModel } from "@/models/Pkpu";
 type SearchParams = {
   q?: string;
   tahun?: string;
-  statusHukum?: "induk" | "revisi";
+  statusHukum?: "berlaku" | "revisi" | "dicabut";
   kategori?: string;
   isActive?: "true" | "false";
   page?: string;
@@ -57,7 +57,7 @@ export default async function AdminPkpuListPage(props: { searchParams: Promise<S
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="text-xl font-bold text-[#1E3A8A]">Manajemen PKPU</h2>
-            <p className="text-sm text-slate-600">Kelola data regulasi, hubungan induk/revisi, dan file PDF.</p>
+            <p className="text-sm text-slate-600">Kelola data regulasi, hubungan status hukum, dan file PDF.</p>
           </div>
           <Link
             href="/admin/pkpu/new"
@@ -88,8 +88,9 @@ export default async function AdminPkpuListPage(props: { searchParams: Promise<S
             className="rounded border border-slate-300 px-3 py-2 text-sm"
           >
             <option value="">Semua Status</option>
-            <option value="induk">Induk</option>
+            <option value="berlaku">Berlaku</option>
             <option value="revisi">Revisi</option>
+            <option value="dicabut">Dicabut</option>
           </select>
           <select
             name="kategori"
@@ -189,11 +190,11 @@ export default async function AdminPkpuListPage(props: { searchParams: Promise<S
                     </td>
                     <td className="px-4 py-3">{kategori?.nama ?? "-"}</td>
                     <td className="px-4 py-3 text-xs text-slate-600">
-                      {item.statusHukum === "revisi" && parent ? (
+                      {(item.statusHukum === "revisi" || item.statusHukum === "dicabut") && parent ? (
                         <span>
-                          Revisi dari {parent.nomor}/{parent.tahun}
+                          {item.statusHukum === "revisi" ? "Revisi dari" : "Mencabut"} {parent.nomor}/{parent.tahun}
                         </span>
-                      ) : item.statusHukum === "induk" ? (
+                      ) : item.statusHukum === "berlaku" || item.statusHukum === "induk" ? (
                         <span>Induk</span>
                       ) : (
                         <span>-</span>

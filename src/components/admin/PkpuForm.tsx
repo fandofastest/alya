@@ -45,7 +45,7 @@ export function PkpuForm(props: {
     tanggalPenetapan: props.initial?.tanggalPenetapan
       ? toDateInputValue(props.initial.tanggalPenetapan)
       : toDateInputValue(new Date()),
-    statusHukum: props.initial?.statusHukum ?? "induk",
+    statusHukum: props.initial?.statusHukum ?? "berlaku",
     kategori: props.initial?.kategori ?? (props.kategoriOptions[0]?._id ?? ""),
     parentId: props.initial?.parentId ?? null,
     isActive: props.initial?.isActive ?? true,
@@ -91,12 +91,12 @@ export function PkpuForm(props: {
     if (!values.tahun || values.tahun < 1945) return setError("Tahun tidak valid.");
     if (!values.tanggalPenetapan) return setError("Tanggal penetapan wajib diisi.");
 
-    if (values.statusHukum === "revisi" && !values.parentId) {
-      return setError("PKPU revisi wajib memilih PKPU induk sebagai parent.");
+    if ((values.statusHukum === "revisi" || values.statusHukum === "dicabut") && !values.parentId) {
+      return setError(`PKPU ${values.statusHukum} wajib memilih PKPU induk sebagai parent.`);
     }
 
-    if (values.statusHukum === "induk" && values.parentId) {
-      return setError("PKPU induk tidak boleh memiliki parent.");
+    if (values.statusHukum === "berlaku" && values.parentId) {
+      return setError("PKPU berlaku (induk) tidak boleh memiliki parent.");
     }
 
     if (props.mode === "create" && !pdfFile) {
@@ -114,7 +114,7 @@ export function PkpuForm(props: {
         statusHukum: values.statusHukum,
         kategori: values.kategori,
         fileUrl,
-        parentId: values.statusHukum === "induk" ? null : values.parentId,
+        parentId: values.statusHukum === "berlaku" ? null : values.parentId,
         isActive: values.isActive,
       };
 
@@ -198,12 +198,13 @@ export function PkpuForm(props: {
             onChange={(e) => {
               const nextStatus = e.target.value as StatusHukum;
               update("statusHukum", nextStatus);
-              if (nextStatus === "induk") update("parentId", null);
+              if (nextStatus === "berlaku") update("parentId", null);
             }}
             className="w-full rounded border border-slate-300 px-3 py-2"
           >
-            <option value="induk">Induk</option>
+            <option value="berlaku">Berlaku</option>
             <option value="revisi">Revisi</option>
+            <option value="dicabut">Dicabut</option>
           </select>
         </label>
         <label className="space-y-1 text-sm">
@@ -221,9 +222,11 @@ export function PkpuForm(props: {
           </select>
         </label>
 
-        {values.statusHukum === "revisi" ? (
+        {values.statusHukum === "revisi" || values.statusHukum === "dicabut" ? (
           <label className="space-y-1 text-sm">
-            <span className="font-semibold text-slate-700">Revisi dari (PKPU Induk)</span>
+            <span className="font-semibold text-slate-700">
+              {values.statusHukum === "revisi" ? "Revisi dari" : "Mencabut"} (PKPU Induk)
+            </span>
             <select
               value={values.parentId ?? ""}
               onChange={(e) => update("parentId", e.target.value || null)}

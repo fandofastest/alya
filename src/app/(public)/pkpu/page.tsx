@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 type SearchParams = {
   q?: string;
   tahun?: string;
-  statusHukum?: "induk" | "revisi";
+  statusHukum?: "berlaku" | "revisi" | "dicabut";
   kategori?: string;
 };
 
@@ -25,7 +25,11 @@ export default async function PkpuListPage(props: { searchParams: Promise<Search
   if (searchParams.tahun && !Number.isNaN(Number(searchParams.tahun))) {
     filter.tahun = Number(searchParams.tahun);
   }
-  if (searchParams.statusHukum === "induk" || searchParams.statusHukum === "revisi") {
+  if (
+    searchParams.statusHukum === "berlaku" ||
+    searchParams.statusHukum === "revisi" ||
+    searchParams.statusHukum === "dicabut"
+  ) {
     filter.statusHukum = searchParams.statusHukum;
   }
   if (searchParams.kategori) {
@@ -62,8 +66,9 @@ export default async function PkpuListPage(props: { searchParams: Promise<Search
             className="rounded border border-slate-300 px-3 py-2 text-sm"
           >
             <option value="">Semua Status</option>
-            <option value="induk">Induk</option>
+            <option value="berlaku">Berlaku</option>
             <option value="revisi">Revisi</option>
+            <option value="dicabut">Dicabut</option>
           </select>
           <select
             name="kategori"

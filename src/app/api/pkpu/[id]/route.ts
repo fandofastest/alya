@@ -16,20 +16,20 @@ async function getPkpuByIdOrSlug(id: string) {
   return PkpuModel.findOne({ slug: id }).populate("kategori").populate("parentId").lean();
 }
 
-export async function GET(_request: Request, context: RouteContext<"/api/pkpu/[id]">) {
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   await connectDb();
-  const { id } = await context.params;
+  const { id } = await params;
   const doc = await getPkpuByIdOrSlug(id);
   if (!doc) return jsonError("PKPU tidak ditemukan.", 404);
   return NextResponse.json({ data: doc });
 }
 
-export async function PUT(request: Request, context: RouteContext<"/api/pkpu/[id]">) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireAdmin();
   if (!auth.ok) return auth.response;
 
   await connectDb();
-  const { id } = await context.params;
+  const { id } = await params;
   const existing = await PkpuModel.findById(id);
   if (!existing) return jsonError("PKPU tidak ditemukan.", 404);
 
@@ -40,18 +40,18 @@ export async function PUT(request: Request, context: RouteContext<"/api/pkpu/[id
   }
 
   const payload = parseResult.data;
-  payload.parentId = payload.statusHukum === "induk" ? null : payload.parentId;
+  payload.parentId = payload.statusHukum === "berlaku" ? null : payload.parentId;
 
   if (!(await KategoriModel.exists({ _id: payload.kategori }))) {
     return jsonError("Kategori tidak ditemukan.", 404);
   }
 
-  if (payload.statusHukum === "revisi") {
+  if (payload.statusHukum === "revisi" || payload.statusHukum === "dicabut") {
     if (!payload.parentId || !Types.ObjectId.isValid(payload.parentId)) {
       return jsonError("Parent PKPU tidak valid.", 400);
     }
-    const parent = await PkpuModel.findOne({ _id: payload.parentId, statusHukum: "induk" });
-    if (!parent) return jsonError("Parent PKPU induk tidak ditemukan.", 404);
+    const parent = await PkpuModel.findOne({ _id: payload.parentId, statusHukum: { $in: ["berlaku", "induk"] } });
+    if (!parent) return jsonError("Parent PKPU berlaku tidak ditemukan.", 404);
   }
 
   existing.set({
@@ -63,19 +63,19 @@ export async function PUT(request: Request, context: RouteContext<"/api/pkpu/[id
   return NextResponse.json({ message: "PKPU berhasil diperbarui.", data: existing });
 }
 
-export async function DELETE(_request: Request, context: RouteContext<"/api/pkpu/[id]">) {
+export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireAdmin();
   if (!auth.ok) return auth.response;
 
   await connectDb();
-  const { id } = await context.params;
+  const { id } = await params;
   const target = await PkpuModel.findById(id);
   if (!target) return jsonError("PKPU tidak ditemukan.", 404);
 
-  if (target.statusHukum === "induk") {
-    const revisiCount = await PkpuModel.countDocuments({ parentId: target._id });
-    if (revisiCount > 0) {
-      return jsonError("PKPU induk tidak dapat dihapus karena memiliki revisi.", 400);
+  if (target.statusHukum === "berlaku" || target.statusHukum === "induk") {
+    const childrenCount = await PkpuModel.countDocuments({ parentId: target._id });
+    if (childrenCount > 0) {
+      return jsonError("PKPU berlaku tidak dapat dihapus karena memiliki relasi revisi/pencabutan.", 400);
     }
   }
 

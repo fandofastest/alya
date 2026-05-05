@@ -17,7 +17,9 @@ export function buildPkpuFilters(searchParams: URLSearchParams) {
     filter.tahun = Number(tahun);
   }
 
-  if (statusHukum === "induk" || statusHukum === "revisi") {
+  if (statusHukum === "berlaku") {
+    filter.statusHukum = { $in: ["berlaku", "induk"] };
+  } else if (statusHukum === "revisi" || statusHukum === "dicabut") {
     filter.statusHukum = statusHukum;
   }
 

@@ -40,11 +40,12 @@ export default async function AdminDashboardPage() {
         </div>
       </section>
 
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-4">
+      <section className="grid grid-cols-1 gap-4 md:grid-cols-5">
         <StatCard label="Total PKPU" value={stats.totalPkpu.toString()} href="/admin/pkpu" />
-        <StatCard label="Total Induk" value={stats.totalInduk.toString()} href="/admin/pkpu?statusHukum=induk" />
-        <StatCard label="Total Revisi" value={stats.totalRevisi.toString()} href="/admin/pkpu?statusHukum=revisi" />
-        <StatCard label="Total Kategori" value={stats.totalKategori.toString()} />
+        <StatCard label="Berlaku" value={stats.totalBerlaku.toString()} href="/admin/pkpu?statusHukum=berlaku" />
+        <StatCard label="Revisi" value={stats.totalRevisi.toString()} href="/admin/pkpu?statusHukum=revisi" />
+        <StatCard label="Dicabut" value={stats.totalDicabut.toString()} href="/admin/pkpu?statusHukum=dicabut" />
+        <StatCard label="Kategori" value={stats.totalKategori.toString()} />
       </section>
 
       <section className="rounded-lg bg-white p-6 shadow-sm">

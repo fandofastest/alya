@@ -38,18 +38,20 @@ export async function getPkpuByKategoriSlug(slug: string) {
 
 export async function getAdminDashboardStats() {
   await connectDb();
-  const [totalPkpu, totalInduk, totalRevisi, totalKategori, lastUpdated] = await Promise.all([
+  const [totalPkpu, totalBerlaku, totalRevisi, totalDicabut, totalKategori, lastUpdated] = await Promise.all([
     PkpuModel.countDocuments({}),
-    PkpuModel.countDocuments({ statusHukum: "induk" }),
+    PkpuModel.countDocuments({ statusHukum: { $in: ["berlaku", "induk"] } }),
     PkpuModel.countDocuments({ statusHukum: "revisi" }),
+    PkpuModel.countDocuments({ statusHukum: "dicabut" }),
     KategoriModel.countDocuments({}),
     PkpuModel.findOne({}).sort({ updatedAt: -1 }).select("updatedAt").lean(),
   ]);
 
   return {
     totalPkpu,
-    totalInduk,
+    totalBerlaku,
     totalRevisi,
+    totalDicabut,
     totalKategori,
     lastUpdatedAt: lastUpdated?.updatedAt ?? null,
   };

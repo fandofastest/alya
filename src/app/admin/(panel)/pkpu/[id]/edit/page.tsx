@@ -12,7 +12,7 @@ export default async function AdminPkpuEditPage(props: { params: Promise<{ id: s
   const [pkpu, kategoriOptions, indukOptions] = await Promise.all([
     PkpuModel.findById(id).lean(),
     KategoriModel.find().sort({ nama: 1 }).select("_id nama").lean(),
-    PkpuModel.find({ statusHukum: "induk" }).sort({ tahun: -1, nomor: -1 }).select("_id nomor tahun judul").lean(),
+    PkpuModel.find({ statusHukum: { $in: ["berlaku", "induk"] } }).sort({ tahun: -1, nomor: -1 }).select("_id nomor tahun judul").lean(),
   ]);
 
   if (!pkpu) return notFound();

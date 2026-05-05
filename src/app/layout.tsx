@@ -9,7 +9,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "Portal Regulasi PKPU",
-  description: "Portal regulasi resmi PKPU dengan struktur hukum induk dan revisi.",
+  description: "Portal regulasi resmi PKPU dengan struktur hukum berlaku, revisi, dan pencabutan.",
 };
 
 export default function RootLayout({
