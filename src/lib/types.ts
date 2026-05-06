@@ -1,4 +1,4 @@
-export type StatusHukum = "berlaku" | "revisi" | "dicabut";
+export type StatusHukum = "berlaku" | "revisi" | "dicabut" | "induk";
 
 export type KategoriRecord = {
   _id: string;

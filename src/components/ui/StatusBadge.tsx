@@ -7,7 +7,7 @@ export function StatusBadge({ status }: { status: StatusHukum }) {
     <span
       className={clsx(
         "rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide",
-        status === "berlaku"
+        status === "berlaku" || status === "induk"
           ? "bg-emerald-100 text-emerald-900"
           : status === "revisi"
           ? "bg-amber-100 text-amber-900"
