@@ -186,7 +186,7 @@ export default async function PkpuDetailPage(props: { params: Promise<{ slug: st
             </div>
             <div className="p-5">
               <a
-                href={`/api/pkpu/${pkpu._id}/download`}
+                href={`/api/pkpu/${pkpu._id.toString()}/download`}
                 target="_blank"
                 rel="noreferrer"
                 className="group flex items-start gap-3 text-[#B91C1C] hover:text-red-700"
@@ -303,7 +303,7 @@ export default async function PkpuDetailPage(props: { params: Promise<{ slug: st
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-slate-800">Pratinjau Dokumen</h2>
           <a
-            href={`/api/pkpu/${pkpu._id}/download`}
+            href={`/api/pkpu/${pkpu._id.toString()}/download`}
             download
             className="flex items-center gap-2 rounded-lg bg-[#B91C1C] px-4 py-2 text-sm font-bold text-white shadow-md shadow-red-100 transition hover:bg-red-700"
           >

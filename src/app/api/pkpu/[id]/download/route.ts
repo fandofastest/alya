@@ -12,9 +12,13 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "PKPU tidak ditemukan." }, { status: 404 });
   }
 
-  // Increment download count in background (or await if you want to be sure)
+  // Increment download count
   await incrementPkpuDownload(id);
 
-  // Redirect to the actual file URL
-  return NextResponse.redirect(pkpu.fileUrl);
+  // Ensure absolute URL for redirect
+  const redirectUrl = pkpu.fileUrl.startsWith("http")
+    ? pkpu.fileUrl
+    : new URL(pkpu.fileUrl, _request.url).toString();
+
+  return NextResponse.redirect(redirectUrl);
 }

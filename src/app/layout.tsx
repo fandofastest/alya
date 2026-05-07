@@ -10,6 +10,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "SIPADU HUKUM",
   description: "Sistem Informasi Terpadu Produk Hukum - KPU Kota Dumai",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({

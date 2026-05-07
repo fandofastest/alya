@@ -10,13 +10,16 @@ export function SiteHeader() {
   return (
     <header className="border-b border-slate-200 bg-white">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4">
-        <Link href="/" className="group">
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 transition-colors group-hover:text-[#F59E0B]">
-            KPU KOTA DUMAI
-          </p>
-          <h1 className="text-xl font-black tracking-tight text-[#B91C1C]">
-            SIPADU <span className="text-[#F59E0B]">HUKUM</span>
-          </h1>
+        <Link href="/" className="group flex items-center gap-3">
+          <img src="/logo.png" alt="Logo KPU" className="h-10 w-auto" />
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 transition-colors group-hover:text-[#F59E0B]">
+              KPU KOTA DUMAI
+            </p>
+            <h1 className="text-xl font-black tracking-tight text-[#B91C1C]">
+              SIPADU <span className="text-[#F59E0B]">HUKUM</span>
+            </h1>
+          </div>
         </Link>
         <nav className="flex items-center gap-5 text-sm font-medium text-slate-700">
           {links.map((link) => (
