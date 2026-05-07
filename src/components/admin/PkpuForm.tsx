@@ -92,7 +92,7 @@ export function PkpuForm(props: {
       formData.append("description", values.judul);
       formData.append("category", "hukum-peraturan");
 
-      const response = await fetch(props.storageConfig.externalUrl, {
+      const response = await fetch("/api/proxy/external-upload", {
         method: "POST",
         headers: {
           "x-integration-token": props.storageConfig.externalToken,
