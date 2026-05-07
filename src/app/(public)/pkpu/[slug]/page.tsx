@@ -38,6 +38,11 @@ export default async function PkpuDetailPage(props: { params: Promise<{ slug: st
       ? (pkpu.kategori as { slug?: string }).slug ?? ""
       : "";
 
+  const parentPopulated =
+    pkpu.parentId && typeof pkpu.parentId === "object" && "tahun" in pkpu.parentId
+      ? (pkpu.parentId as unknown as { nomor: number; tahun: number; slug: string })
+      : null;
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Breadcrumbs */}
@@ -133,14 +138,14 @@ export default async function PkpuDetailPage(props: { params: Promise<{ slug: st
 
                 <div className="relative flex w-full justify-around">
                   {/* If there's a parent, show it as an earlier point */}
-                  {pkpu.parentId && typeof pkpu.parentId === "object" && (
+                  {parentPopulated && (
                     <div className="group relative flex flex-col items-center">
                       <div className="mb-4 text-sm font-bold text-slate-500">
-                        {(pkpu.parentId as { tahun: number }).tahun}
+                        {parentPopulated.tahun}
                       </div>
                       <div className="z-10 h-6 w-6 rounded-full border-4 border-white bg-slate-400 ring-2 ring-slate-400 group-hover:bg-slate-500" />
                       <div className="absolute -bottom-10 w-32 text-center text-xs text-slate-500 line-clamp-2">
-                        PKPU No {(pkpu.parentId as { nomor: number }).nomor} (Induk/Revisi)
+                        PKPU No {parentPopulated.nomor} (Induk/Revisi)
                       </div>
                     </div>
                   )}
@@ -232,17 +237,16 @@ export default async function PkpuDetailPage(props: { params: Promise<{ slug: st
               </h3>
             </div>
             <div className="p-5">
-              {pkpu.parentId && typeof pkpu.parentId === "object" ? (
+              {parentPopulated ? (
                 <Link
-                  href={`/pkpu/${(pkpu.parentId as { slug: string }).slug}`}
+                  href={`/pkpu/${parentPopulated.slug}`}
                   className="group flex items-start gap-3 text-[#B91C1C] hover:text-red-700"
                 >
                   <div className="mt-1 rounded bg-red-50 p-2 text-[#B91C1C] group-hover:bg-red-100">
                     <ArrowUpRight className="h-5 w-5" />
                   </div>
                   <div className="text-sm font-semibold underline decoration-red-200 underline-offset-4 group-hover:decoration-red-400">
-                    PKPU No {(pkpu.parentId as { nomor: number }).nomor} Tahun{" "}
-                    {(pkpu.parentId as { tahun: number }).tahun}
+                    PKPU No {parentPopulated.nomor} Tahun {parentPopulated.tahun}
                   </div>
                 </Link>
               ) : (
