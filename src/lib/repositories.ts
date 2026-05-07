@@ -56,3 +56,13 @@ export async function getAdminDashboardStats() {
     lastUpdatedAt: lastUpdated?.updatedAt ?? null,
   };
 }
+
+export async function incrementPkpuView(id: string) {
+  await connectDb();
+  return PkpuModel.findByIdAndUpdate(id, { $inc: { viewCount: 1 } });
+}
+
+export async function incrementPkpuDownload(id: string) {
+  await connectDb();
+  return PkpuModel.findByIdAndUpdate(id, { $inc: { downloadCount: 1 } });
+}

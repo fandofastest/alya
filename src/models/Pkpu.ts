@@ -18,6 +18,8 @@ const pkpuSchema = new Schema(
     fileUrl: { type: String, required: true },
     parentId: { type: Schema.Types.ObjectId, ref: "Pkpu", default: null },
     isActive: { type: Boolean, default: true },
+    viewCount: { type: Number, default: 0 },
+    downloadCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

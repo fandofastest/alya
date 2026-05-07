@@ -13,7 +13,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { getPkpuBySlug, getRevisiListByParent } from "@/lib/repositories";
+import {
+  getPkpuBySlug,
+  getRevisiListByParent,
+  incrementPkpuView,
+} from "@/lib/repositories";
 import { formatTanggalIndonesia } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -27,6 +31,9 @@ export default async function PkpuDetailPage(props: { params: Promise<{ slug: st
     pkpu.statusHukum === "berlaku" || pkpu.statusHukum === "induk"
       ? await getRevisiListByParent(pkpu._id.toString())
       : [];
+
+  // Increment view count
+  await incrementPkpuView(pkpu._id.toString());
 
   const kategoriNama =
     pkpu.kategori && typeof pkpu.kategori === "object" && "nama" in pkpu.kategori
@@ -179,7 +186,7 @@ export default async function PkpuDetailPage(props: { params: Promise<{ slug: st
             </div>
             <div className="p-5">
               <a
-                href={pkpu.fileUrl}
+                href={`/api/pkpu/${pkpu._id}/download`}
                 target="_blank"
                 rel="noreferrer"
                 className="group flex items-start gap-3 text-[#B91C1C] hover:text-red-700"
@@ -212,14 +219,18 @@ export default async function PkpuDetailPage(props: { params: Promise<{ slug: st
                   <Eye className="h-5 w-5 text-slate-400" />
                   <div>
                     <div className="text-xs text-slate-500">Dilihat</div>
-                    <div className="text-sm font-bold text-slate-800">1.240</div>
+                    <div className="text-sm font-bold text-slate-800">
+                      {(pkpu as any).viewCount || 0}
+                    </div>
                   </div>
                 </div>
                 <div className="flex items-center gap-3 rounded-lg border border-slate-100 bg-slate-50 p-3">
                   <Download className="h-5 w-5 text-slate-400" />
                   <div>
                     <div className="text-xs text-slate-500">Unduh</div>
-                    <div className="text-sm font-bold text-slate-800">582</div>
+                    <div className="text-sm font-bold text-slate-800">
+                      {(pkpu as any).downloadCount || 0}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -292,7 +303,7 @@ export default async function PkpuDetailPage(props: { params: Promise<{ slug: st
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-slate-800">Pratinjau Dokumen</h2>
           <a
-            href={pkpu.fileUrl}
+            href={`/api/pkpu/${pkpu._id}/download`}
             download
             className="flex items-center gap-2 rounded-lg bg-[#B91C1C] px-4 py-2 text-sm font-bold text-white shadow-md shadow-red-100 transition hover:bg-red-700"
           >
