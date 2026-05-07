@@ -114,9 +114,8 @@ export function PkpuForm(props: {
 
     // Default to ALYA API upload (which might hit Vercel limit)
     const response = await fetch("/api/upload", { method: "POST", body: formData });
-    const payload = (await response.json().catch(() => null)) as
-      | { fileUrl?: string; message?: string }
-      | null;
+    const rawPayload = await response.json().catch(() => null);
+    const payload = rawPayload as { fileUrl?: string; message?: string } | null;
 
     if (!response.ok || !payload?.fileUrl) {
       throw new Error(payload?.message ?? "Upload PDF gagal.");
