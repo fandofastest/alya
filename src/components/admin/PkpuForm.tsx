@@ -33,6 +33,11 @@ function toDateInputValue(value: Date | string) {
 export function PkpuForm(props: {
   mode: "create" | "edit";
   pkpuId?: string;
+  storageConfig: {
+    driver: string;
+    externalUrl?: string;
+    externalToken?: string;
+  };
   kategoriOptions: KategoriOption[];
   indukOptions: IndukOption[];
   initial?: PkpuFormInitial;
@@ -61,7 +66,6 @@ export function PkpuForm(props: {
     setValues((prev) => ({ ...prev, [key]: value }));
   }
 
-  async function uploadIfNeeded() {
     if (!pdfFile) return values.fileUrl;
     const formData = new FormData();
     formData.set("file", pdfFile);
@@ -70,6 +74,45 @@ export function PkpuForm(props: {
     formData.set("judul", values.judul);
     formData.set("tanggalPenetapan", values.tanggalPenetapan);
 
+    // Direct upload to external server if driver is 'external'
+    if (
+      props.storageConfig.driver === "external" &&
+      props.storageConfig.externalUrl &&
+      props.storageConfig.externalToken
+    ) {
+      formData.append("senderName", "Portal ALYA");
+      formData.append("uploaderPhone", "081378949932");
+      formData.append("docNumber", String(values.nomor));
+      formData.append("docDate", values.tanggalPenetapan);
+      formData.append("title", values.judul);
+      formData.append("year", String(values.tahun));
+      formData.append("sourceType", "api");
+      formData.append("caption", values.judul);
+      formData.append("description", values.judul);
+      formData.append("category", "hukum-peraturan");
+
+      const response = await fetch(props.storageConfig.externalUrl, {
+        method: "POST",
+        headers: {
+          "x-integration-token": props.storageConfig.externalToken,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Direct upload failed with status ${response.status}`);
+      }
+
+      const result = await response.json();
+      if (!result.success || !result.data?.archive?.archiveId) {
+        throw new Error("Gagal mendapatkan archive ID dari server eksternal.");
+      }
+
+      return `/api/pkpu/file/${result.data.archive.archiveId}`;
+    }
+
+    // Default to ALYA API upload (which might hit Vercel limit)
     const response = await fetch("/api/upload", { method: "POST", body: formData });
     const payload = (await response.json().catch(() => null)) as
       | { fileUrl?: string; message?: string }

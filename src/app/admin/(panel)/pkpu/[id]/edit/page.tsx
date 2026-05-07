@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 
 import { PkpuForm } from "@/components/admin/PkpuForm";
 import { connectDb } from "@/lib/db";
+import { env } from "@/lib/env";
 import { KategoriModel } from "@/models/Kategori";
 import { PkpuModel } from "@/models/Pkpu";
 
@@ -12,10 +13,19 @@ export default async function AdminPkpuEditPage(props: { params: Promise<{ id: s
   const [pkpu, kategoriOptions, indukOptions] = await Promise.all([
     PkpuModel.findById(id).lean(),
     KategoriModel.find().sort({ nama: 1 }).select("_id nama").lean(),
-    PkpuModel.find({ statusHukum: { $in: ["berlaku", "induk"] } }).sort({ tahun: -1, nomor: -1 }).select("_id nomor tahun judul").lean(),
+    PkpuModel.find({ statusHukum: { $in: ["berlaku", "induk"] } })
+      .sort({ tahun: -1, nomor: -1 })
+      .select("_id nomor tahun judul")
+      .lean(),
   ]);
 
   if (!pkpu) return notFound();
+
+  const storageConfig = {
+    driver: env.STORAGE_DRIVER,
+    externalUrl: env.EXTERNAL_UPLOAD_URL,
+    externalToken: env.EXTERNAL_UPLOAD_TOKEN,
+  };
 
   return (
     <div className="space-y-6">
@@ -30,6 +40,7 @@ export default async function AdminPkpuEditPage(props: { params: Promise<{ id: s
         <PkpuForm
           mode="edit"
           pkpuId={pkpu._id.toString()}
+          storageConfig={storageConfig}
           kategoriOptions={kategoriOptions.map((k) => ({ _id: k._id.toString(), nama: k.nama }))}
           indukOptions={indukOptions.map((p) => ({
             _id: p._id.toString(),

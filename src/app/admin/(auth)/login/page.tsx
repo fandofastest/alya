@@ -38,9 +38,10 @@ export default function AdminLoginPage() {
 
   return (
     <div className="mx-auto w-full max-w-md rounded-lg bg-white p-6 shadow-sm">
-      <div className="space-y-1">
-        <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">Panel Administrasi</p>
-        <h1 className="text-xl font-bold text-[#B91C1C]">Login Admin</h1>
+      <div className="mb-6 flex flex-col items-center text-center">
+        <img src="/logo.png" alt="Logo KPU" className="mb-4 h-16 w-auto" />
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-500">Panel Administrasi</p>
+        <h1 className="text-2xl font-black text-[#B91C1C]">Login Admin</h1>
         <p className="text-sm text-slate-600">Masuk untuk mengelola PKPU dan file regulasi.</p>
       </div>
 
