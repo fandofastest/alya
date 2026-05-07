@@ -66,6 +66,7 @@ export function PkpuForm(props: {
     setValues((prev) => ({ ...prev, [key]: value }));
   }
 
+  async function uploadIfNeeded() {
     if (!pdfFile) return values.fileUrl;
     const formData = new FormData();
     formData.set("file", pdfFile);
