@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const links = [
   { href: "/", label: "Beranda" },
-  { href: "/pkpu", label: "Daftar PKPU" },
+  { href: "/pkpu", label: "Direktori" },
   { href: "/bantuan", label: "Bantuan" },
 ];
 
