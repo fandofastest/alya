@@ -44,7 +44,7 @@ export default async function PkpuListPage(props: { searchParams: Promise<Search
   return (
     <div className="space-y-6">
       <section className="rounded-lg bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-bold text-[#1E3A8A]">Daftar PKPU</h2>
+        <h2 className="text-xl font-bold text-[#B91C1C]">Daftar PKPU</h2>
         <form className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-4">
           <input
             type="text"
@@ -84,7 +84,7 @@ export default async function PkpuListPage(props: { searchParams: Promise<Search
           </select>
           <button
             type="submit"
-            className="rounded bg-[#1E3A8A] px-4 py-2 text-sm font-semibold text-white md:col-span-4 md:w-40"
+            className="rounded bg-[#B91C1C] px-4 py-2 text-sm font-semibold text-white md:col-span-4 md:w-40"
           >
             Terapkan Filter
           </button>
@@ -120,10 +120,10 @@ export default async function PkpuListPage(props: { searchParams: Promise<Search
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex gap-2">
-                        <Link href={`/pkpu/${item.slug}`} className="text-[#1E3A8A] hover:underline">
+                        <Link href={`/pkpu/${item.slug}`} className="text-[#B91C1C] hover:underline">
                           Preview
                         </Link>
-                        <a href={item.fileUrl} className="text-[#1E3A8A] hover:underline" download>
+                        <a href={item.fileUrl} className="text-[#B91C1C] hover:underline" download>
                           Download
                         </a>
                       </div>

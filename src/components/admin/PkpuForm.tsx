@@ -248,7 +248,7 @@ export function PkpuForm(props: {
           {values.fileUrl ? (
             <p className="text-xs text-slate-600">
               File saat ini:{" "}
-              <a href={values.fileUrl} className="font-semibold text-[#1E3A8A] hover:underline">
+              <a href={values.fileUrl} className="font-semibold text-[#B91C1C] hover:underline">
                 {values.fileUrl}
               </a>
             </p>
@@ -284,7 +284,7 @@ export function PkpuForm(props: {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded bg-[#1E3A8A] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          className="rounded bg-[#B91C1C] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
         >
           {isSubmitting ? "Menyimpan..." : "Simpan"}
         </button>

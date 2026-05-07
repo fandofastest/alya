@@ -24,7 +24,7 @@ export default async function PkpuDetailPage(props: { params: Promise<{ slug: st
             <p className="text-sm text-slate-600">
               PKPU Nomor {pkpu.nomor} Tahun {pkpu.tahun}
             </p>
-            <h2 className="mt-1 text-2xl font-bold text-[#1E3A8A]">{pkpu.judul}</h2>
+            <h2 className="mt-1 text-2xl font-bold text-[#B91C1C]">{pkpu.judul}</h2>
           </div>
           <StatusBadge status={pkpu.statusHukum} />
         </div>
@@ -56,12 +56,12 @@ export default async function PkpuDetailPage(props: { params: Promise<{ slug: st
           </p>
         ) : null}
         {(pkpu.statusHukum === "berlaku" || pkpu.statusHukum === "induk") && revisiList.length > 0 ? (
-          <div className="mt-4 rounded bg-blue-50 px-4 py-3">
-            <p className="text-sm font-semibold text-[#1E3A8A]">Daftar Revisi/Pencabutan:</p>
+          <div className="mt-4 rounded bg-red-50 px-4 py-3">
+            <p className="text-sm font-semibold text-[#B91C1C]">Daftar Revisi/Pencabutan:</p>
             <ul className="mt-2 space-y-1 text-sm">
               {revisiList.map((item) => (
                 <li key={item._id.toString()}>
-                  <Link href={`/pkpu/${item.slug}`} className="text-[#1E3A8A] hover:underline">
+                  <Link href={`/pkpu/${item.slug}`} className="text-[#B91C1C] hover:underline">
                     PKPU No {item.nomor} Tahun {item.tahun}
                   </Link>
                 </li>

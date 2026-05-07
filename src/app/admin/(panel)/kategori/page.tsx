@@ -14,12 +14,12 @@ export default async function AdminKategoriPage() {
     <div className="space-y-6">
       <section className="flex items-center justify-between rounded-lg bg-white p-6 shadow-sm">
         <div>
-          <h2 className="text-xl font-bold text-[#1E3A8A]">Kelola Kategori</h2>
+          <h2 className="text-xl font-bold text-[#B91C1C]">Kelola Kategori</h2>
           <p className="mt-1 text-sm text-slate-600">Daftar kategori regulasi untuk pengelompokan PKPU.</p>
         </div>
         <Link
           href="/admin/kategori/new"
-          className="rounded bg-[#1E3A8A] px-4 py-2 text-sm font-semibold text-white hover:bg-blue-900"
+          className="rounded bg-[#B91C1C] px-4 py-2 text-sm font-semibold text-white hover:bg-red-900"
         >
           Tambah Kategori
         </Link>
@@ -54,7 +54,7 @@ export default async function AdminKategoriPage() {
                     <td className="px-6 py-4 text-right space-x-4">
                       <Link
                         href={`/admin/kategori/${item._id.toString()}`}
-                        className="text-xs font-semibold text-blue-600 hover:underline"
+                        className="text-xs font-semibold text-red-600 hover:underline"
                       >
                         Edit
                       </Link>

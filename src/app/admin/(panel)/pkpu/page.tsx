@@ -56,12 +56,12 @@ export default async function AdminPkpuListPage(props: { searchParams: Promise<S
       <section className="rounded-lg bg-white p-6 shadow-sm">
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-xl font-bold text-[#1E3A8A]">Manajemen PKPU</h2>
+            <h2 className="text-xl font-bold text-[#B91C1C]">Manajemen PKPU</h2>
             <p className="text-sm text-slate-600">Kelola data regulasi, hubungan status hukum, dan file PDF.</p>
           </div>
           <Link
             href="/admin/pkpu/new"
-            className="inline-flex items-center justify-center rounded bg-[#1E3A8A] px-4 py-2 text-sm font-semibold text-white"
+            className="inline-flex items-center justify-center rounded bg-[#B91C1C] px-4 py-2 text-sm font-semibold text-white"
           >
             Tambah PKPU
           </Link>
@@ -115,7 +115,7 @@ export default async function AdminPkpuListPage(props: { searchParams: Promise<S
           </select>
 
           <div className="flex flex-wrap gap-3 md:col-span-6">
-            <button type="submit" className="rounded bg-[#1E3A8A] px-4 py-2 text-sm font-semibold text-white">
+            <button type="submit" className="rounded bg-[#B91C1C] px-4 py-2 text-sm font-semibold text-white">
               Terapkan Filter
             </button>
             <Link
@@ -216,7 +216,7 @@ export default async function AdminPkpuListPage(props: { searchParams: Promise<S
                       <div className="flex flex-col items-start gap-1">
                         <Link
                           href={`/admin/pkpu/${item._id.toString()}/edit`}
-                          className="text-sm font-semibold text-[#1E3A8A] hover:underline"
+                          className="text-sm font-semibold text-[#B91C1C] hover:underline"
                         >
                           Edit
                         </Link>

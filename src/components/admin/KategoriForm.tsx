@@ -62,7 +62,7 @@ export function KategoriForm(props: {
           type="text"
           value={values.nama}
           onChange={(e) => setValues({ ...values, nama: e.target.value })}
-          className="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-[#1E3A8A] focus:outline-none"
+          className="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-[#B91C1C] focus:outline-none"
           placeholder="Misal: Peraturan Komisi"
           required
         />
@@ -73,7 +73,7 @@ export function KategoriForm(props: {
         <textarea
           value={values.deskripsi}
           onChange={(e) => setValues({ ...values, deskripsi: e.target.value })}
-          className="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-[#1E3A8A] focus:outline-none"
+          className="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-[#B91C1C] focus:outline-none"
           rows={4}
           placeholder="Keterangan singkat kategori ini..."
         />
@@ -90,7 +90,7 @@ export function KategoriForm(props: {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="rounded bg-[#1E3A8A] px-4 py-2 text-sm font-semibold text-white hover:bg-blue-900 disabled:opacity-60"
+          className="rounded bg-[#B91C1C] px-4 py-2 text-sm font-semibold text-white hover:bg-red-900 disabled:opacity-60"
         >
           {isSubmitting ? "Menyimpan..." : "Simpan Kategori"}
         </button>

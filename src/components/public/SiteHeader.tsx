@@ -14,13 +14,13 @@ export function SiteHeader() {
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500 transition-colors group-hover:text-[#F59E0B]">
             KPU KOTA DUMAI
           </p>
-          <h1 className="text-xl font-black tracking-tight text-[#1E3A8A]">
-            ALYA <span className="text-[#F59E0B]">Portal</span>
+          <h1 className="text-xl font-black tracking-tight text-[#B91C1C]">
+            SIPADU <span className="text-[#F59E0B]">HUKUM</span>
           </h1>
         </Link>
         <nav className="flex items-center gap-5 text-sm font-medium text-slate-700">
           {links.map((link) => (
-            <Link key={link.href} href={link.href} className="hover:text-[#1E3A8A]">
+            <Link key={link.href} href={link.href} className="hover:text-[#B91C1C]">
               {link.label}
             </Link>
           ))}

@@ -18,15 +18,15 @@ export default async function HomePage() {
       <section className="hero-gradient -mt-8 -mx-4 px-4 py-20 text-center text-white shadow-inner md:py-28">
         <div className="mx-auto max-w-4xl space-y-8">
           <div className="space-y-4">
-            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold tracking-wide text-blue-100 backdrop-blur-md">
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold tracking-wide text-red-100 backdrop-blur-md">
               <BookOpen size={16} />
-              <span>Jaringan Dokumentasi dan Informasi Hukum</span>
+              <span>Sistem Informasi Terpadu Produk Hukum</span>
             </div>
             <h1 className="text-4xl font-extrabold tracking-tight md:text-6xl">
-              Portal Regulasi <span className="text-[#F59E0B]">ALYA</span>
+              SIPADU <span className="text-[#F59E0B]">HUKUM</span>
             </h1>
-            <p className="mx-auto max-w-2xl text-lg text-blue-100/90 md:text-xl">
-              Temukan dan unduh produk hukum resmi Peraturan Komisi Pemilihan Umum dengan mudah, cepat, dan akurat.
+            <p className="mx-auto max-w-2xl text-lg text-red-100/90 md:text-xl">
+              Portal resmi Komisi Pemilihan Umum Kota Dumai untuk akses regulasi dan produk hukum yang mudah, cepat, dan akurat.
             </p>
           </div>
 
@@ -37,7 +37,7 @@ export default async function HomePage() {
       {/* Statistik / Keunggulan */}
       <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 px-4 md:grid-cols-3">
         <div className="flex items-center gap-4 rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md">
-          <div className="rounded-xl bg-blue-100 p-3 text-blue-700">
+          <div className="rounded-xl bg-red-100 p-3 text-red-700">
             <FileText size={24} />
           </div>
           <div>
@@ -77,16 +77,16 @@ export default async function HomePage() {
             <Link
               key={item._id.toString()}
               href={`/kategori/${item.slug}`}
-              className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition-all hover:-translate-y-1 hover:shadow-xl hover:ring-blue-500"
+              className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition-all hover:-translate-y-1 hover:shadow-xl hover:ring-red-500"
             >
               <div className="relative z-10 space-y-3">
-                <div className="inline-block rounded-lg bg-slate-50 p-2 text-slate-600 transition-colors group-hover:bg-blue-50 group-hover:text-blue-600">
+                <div className="inline-block rounded-lg bg-slate-50 p-2 text-slate-600 transition-colors group-hover:bg-red-50 group-hover:text-red-600">
                   <Layers size={20} />
                 </div>
-                <h3 className="font-bold text-slate-900 group-hover:text-blue-700">{item.nama}</h3>
+                <h3 className="font-bold text-slate-900 group-hover:text-red-700">{item.nama}</h3>
                 <p className="text-xs text-slate-500 line-clamp-2">{item.deskripsi || "Dokumen regulasi terkait kategori ini."}</p>
               </div>
-              <div className="absolute bottom-4 right-4 text-slate-300 transition-transform group-hover:translate-x-1 group-hover:text-blue-400">
+              <div className="absolute bottom-4 right-4 text-slate-300 transition-transform group-hover:translate-x-1 group-hover:text-red-400">
                 <ArrowRight size={18} />
               </div>
             </Link>
@@ -101,7 +101,7 @@ export default async function HomePage() {
             <h2 className="text-2xl font-bold text-slate-900">Produk Hukum Terbaru</h2>
             <p className="mt-1 text-sm text-slate-600">Daftar regulasi PKPU yang baru saja diterbitkan.</p>
           </div>
-          <Link href="/pkpu" className="flex items-center gap-1 text-sm font-bold text-blue-700 hover:underline">
+          <Link href="/pkpu" className="flex items-center gap-1 text-sm font-bold text-red-700 hover:underline">
             Lihat Semua <ArrowRight size={14} />
           </Link>
         </div>
@@ -114,26 +114,26 @@ export default async function HomePage() {
               <Link
                 key={item._id.toString()}
                 href={`/pkpu/${item.slug}`}
-                className="group flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 transition-all hover:shadow-md hover:ring-blue-200 md:flex-row md:items-center"
+                className="group flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 transition-all hover:shadow-md hover:ring-red-200 md:flex-row md:items-center"
               >
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-600">
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-slate-50 text-slate-400 group-hover:bg-red-50 group-hover:text-red-600">
                   <FileText size={28} />
                 </div>
                 <div className="flex-1 space-y-1">
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                    <span className="text-xs font-bold uppercase tracking-wider text-blue-700">
+                    <span className="text-xs font-bold uppercase tracking-wider text-red-700">
                       PKPU No. {item.nomor} Tahun {item.tahun}
                     </span>
                     <StatusBadge status={item.statusHukum} />
                   </div>
-                  <h3 className="font-bold text-slate-900 group-hover:text-blue-800 line-clamp-1">
+                  <h3 className="font-bold text-slate-900 group-hover:text-red-800 line-clamp-1">
                     {item.judul}
                   </h3>
                   <p className="text-xs text-slate-500">
                     Ditetapkan pada: <span className="font-medium">{formatTanggalIndonesia(item.tanggalPenetapan)}</span>
                   </p>
                 </div>
-                <div className="flex items-center gap-2 rounded-full bg-slate-50 px-4 py-2 text-xs font-bold text-slate-600 transition-colors group-hover:bg-[#1E3A8A] group-hover:text-white">
+                <div className="flex items-center gap-2 rounded-full bg-slate-50 px-4 py-2 text-xs font-bold text-slate-600 transition-colors group-hover:bg-[#B91C1C] group-hover:text-white">
                   Lihat Detail
                 </div>
               </Link>

@@ -22,7 +22,7 @@ export default async function AdminPanelLayout({ children }: { children: React.R
             <p className="text-xs font-semibold uppercase tracking-widest text-slate-600">
               Panel Administrasi
             </p>
-            <h1 className="text-lg font-bold text-[#1E3A8A]">Portal Regulasi PKPU</h1>
+            <h1 className="text-lg font-bold text-[#B91C1C]">SIPADU HUKUM</h1>
           </div>
           <div className="flex items-center gap-4">
             <p className="hidden text-sm text-slate-600 md:block">{session.email}</p>
@@ -32,7 +32,7 @@ export default async function AdminPanelLayout({ children }: { children: React.R
         <div className="border-t border-slate-200 bg-slate-50">
           <nav className="mx-auto flex w-full max-w-6xl items-center gap-6 px-4 py-3 text-sm font-semibold text-slate-700">
             {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} className="hover:text-[#1E3A8A]">
+              <Link key={link.href} href={link.href} className="hover:text-[#B91C1C]">
                 {link.label}
               </Link>
             ))}

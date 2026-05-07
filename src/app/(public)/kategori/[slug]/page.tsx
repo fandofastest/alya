@@ -15,7 +15,7 @@ export default async function KategoriPage(props: { params: Promise<{ slug: stri
   return (
     <div className="space-y-6">
       <section className="rounded-lg bg-white p-6 shadow-sm">
-        <h2 className="text-2xl font-bold text-[#1E3A8A]">{kategori.nama}</h2>
+        <h2 className="text-2xl font-bold text-[#B91C1C]">{kategori.nama}</h2>
         <p className="mt-2 text-sm text-slate-600">{kategori.deskripsi || "Kategori regulasi PKPU."}</p>
       </section>
       <section className="rounded-lg bg-white p-6 shadow-sm">
@@ -27,7 +27,7 @@ export default async function KategoriPage(props: { params: Promise<{ slug: stri
               <article key={item._id.toString()} className="rounded border border-slate-200 p-4">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <h3 className="font-semibold text-[#1E3A8A]">
+                    <h3 className="font-semibold text-[#B91C1C]">
                       <Link href={`/pkpu/${item.slug}`} className="hover:underline">
                         PKPU No {item.nomor} Tahun {item.tahun}
                       </Link>

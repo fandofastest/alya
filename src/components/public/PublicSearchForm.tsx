@@ -16,7 +16,7 @@ export function PublicSearchForm() {
 
   return (
     <form onSubmit={handleSubmit} className="relative mx-auto max-w-2xl">
-      <div className="group relative flex items-center overflow-hidden rounded-full bg-white shadow-xl ring-4 ring-blue-500/10 transition-all focus-within:ring-blue-500/30">
+      <div className="group relative flex items-center overflow-hidden rounded-full bg-white shadow-xl ring-4 ring-red-500/10 transition-all focus-within:ring-red-500/30">
         <div className="pl-6 text-slate-400">
           <Search size={20} />
         </div>
@@ -29,12 +29,12 @@ export function PublicSearchForm() {
         />
         <button
           type="submit"
-          className="mr-2 rounded-full bg-[#1E3A8A] px-8 py-3 text-sm font-bold text-white transition-all hover:bg-blue-900 active:scale-95"
+          className="mr-2 rounded-full bg-[#B91C1C] px-8 py-3 text-sm font-bold text-white transition-all hover:bg-red-900 active:scale-95"
         >
           CARI
         </button>
       </div>
-      <div className="mt-4 flex items-center justify-center gap-4 text-sm text-blue-100/80">
+      <div className="mt-4 flex items-center justify-center gap-4 text-sm text-red-100/80">
         <span>Contoh: </span>
         <button
           type="button"

@@ -5,7 +5,7 @@ const basePkpuSchema = z.object({
   tahun: z.coerce.number().int().min(1945).max(2200),
   judul: z.string().min(5),
   tanggalPenetapan: z.coerce.date(),
-  statusHukum: z.enum(["berlaku", "revisi", "dicabut"]),
+  statusHukum: z.enum(["berlaku", "revisi", "dicabut", "induk"]),
   kategori: z.string().min(1),
   fileUrl: z.string().min(1),
   parentId: z.string().nullable().optional(),
@@ -21,7 +21,7 @@ export const createPkpuSchema = basePkpuSchema.superRefine((data, ctx) => {
     });
   }
 
-  if (data.statusHukum === "berlaku" && data.parentId) {
+  if ((data.statusHukum === "berlaku" || data.statusHukum === "induk") && data.parentId) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: "PKPU berlaku (induk) tidak boleh memiliki parentId.",

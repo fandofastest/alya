@@ -40,7 +40,7 @@ export default function AdminLoginPage() {
     <div className="mx-auto w-full max-w-md rounded-lg bg-white p-6 shadow-sm">
       <div className="space-y-1">
         <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">Panel Administrasi</p>
-        <h1 className="text-xl font-bold text-[#1E3A8A]">Login Admin</h1>
+        <h1 className="text-xl font-bold text-[#B91C1C]">Login Admin</h1>
         <p className="text-sm text-slate-600">Masuk untuk mengelola PKPU dan file regulasi.</p>
       </div>
 
@@ -73,7 +73,7 @@ export default function AdminLoginPage() {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full rounded bg-[#1E3A8A] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+          className="w-full rounded bg-[#B91C1C] px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
         >
           {isLoading ? "Memproses..." : "Masuk"}
         </button>

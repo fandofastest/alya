@@ -8,15 +8,15 @@ export function SiteFooter() {
           {/* Brand Column */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 rounded bg-[#1E3A8A] flex items-center justify-center text-white font-bold">
-                A
+              <div className="h-8 w-8 rounded bg-[#B91C1C] flex items-center justify-center text-white font-bold">
+                S
               </div>
-              <span className="text-xl font-bold tracking-tight text-[#1E3A8A]">
-                ALYA <span className="text-[#F59E0B]">Portal</span>
+              <span className="text-xl font-bold tracking-tight text-[#B91C1C]">
+                SIPADU <span className="text-[#F59E0B]">HUKUM</span>
               </span>
             </div>
             <p className="text-sm leading-relaxed text-slate-500">
-              Jaringan Dokumentasi dan Informasi Hukum (JDIH) Komisi Pemilihan Umum Kota Dumai.
+              Sistem Informasi Terpadu Produk Hukum (SIPADU HUKUM) Komisi Pemilihan Umum Kota Dumai.
               Menyediakan akses mudah ke berbagai regulasi dan produk hukum resmi.
             </p>
           </div>
@@ -33,7 +33,7 @@ export function SiteFooter() {
               </div>
               <div className="flex items-center gap-3 text-sm text-slate-600">
                 <Mail className="h-4 w-4 shrink-0 text-[#F59E0B]" />
-                <a href="mailto:tekhumkpudumai@gmail.com" className="hover:text-[#1E3A8A] hover:underline">
+                <a href="mailto:tekhumkpudumai@gmail.com" className="hover:text-[#B91C1C] hover:underline">
                   tekhumkpudumai@gmail.com
                 </a>
               </div>
@@ -56,7 +56,7 @@ export function SiteFooter() {
       <div className="border-t border-slate-100 bg-slate-50 py-4">
         <div className="mx-auto max-w-6xl px-4 text-center">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
-            JDIH Komisi Pemilihan Umum Kota Dumai
+            SIPADU HUKUM - Komisi Pemilihan Umum Kota Dumai
           </p>
         </div>
       </div>

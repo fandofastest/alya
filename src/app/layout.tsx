@@ -8,8 +8,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Portal Regulasi PKPU",
-  description: "Portal regulasi resmi PKPU dengan struktur hukum berlaku, revisi, dan pencabutan.",
+  title: "SIPADU HUKUM",
+  description: "Sistem Informasi Terpadu Produk Hukum - KPU Kota Dumai",
 };
 
 export default function RootLayout({

@@ -20,7 +20,7 @@ export default async function AdminPkpuEditPage(props: { params: Promise<{ id: s
   return (
     <div className="space-y-6">
       <section className="rounded-lg bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-bold text-[#1E3A8A]">Edit PKPU</h2>
+        <h2 className="text-xl font-bold text-[#B91C1C]">Edit PKPU</h2>
         <p className="mt-1 text-sm text-slate-600">
           Perbarui data, relasi hukum, dan file PDF regulasi.
         </p>
