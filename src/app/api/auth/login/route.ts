@@ -7,13 +7,13 @@ import {
   verifyAdminCredentials,
 } from "@/lib/auth";
 import { jsonError } from "@/lib/api";
-import { loginSchema } from "@/validators/auth";
+import { adminLoginSchema } from "@/validators/auth";
 
 export async function POST(request: Request) {
   await ensureDefaultAdmin();
 
   const body = await request.json();
-  const parseResult = loginSchema.safeParse(body);
+  const parseResult = adminLoginSchema.safeParse(body);
   if (!parseResult.success) {
     return jsonError("Data login tidak valid.", 400);
   }

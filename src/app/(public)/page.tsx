@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { FileText, Search, BookOpen, Layers, Clock, ArrowRight } from "lucide-react";
+import { FileText, BookOpen, Layers, Clock, ArrowRight } from "lucide-react";
 
 import { EmptyState } from "@/components/public/EmptyState";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { getI18n } from "@/lib/i18n-server";
 import { formatTanggalIndonesia } from "@/lib/utils";
 import { getKategoriList, getLatestPkpu } from "@/lib/repositories";
 import { PublicSearchForm } from "@/components/public/PublicSearchForm";
@@ -10,6 +11,7 @@ import { PublicSearchForm } from "@/components/public/PublicSearchForm";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
+  const { locale, t } = await getI18n();
   const [latestPkpu, kategori] = await Promise.all([getLatestPkpu(6), getKategoriList()]);
 
   return (
@@ -20,13 +22,13 @@ export default async function HomePage() {
           <div className="space-y-4">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1.5 text-sm font-semibold tracking-wide text-red-100 backdrop-blur-md">
               <BookOpen size={16} />
-              <span>Sistem Informasi Terpadu Produk Hukum</span>
+              <span>{t.home.badge}</span>
             </div>
             <h1 className="text-4xl font-extrabold tracking-tight md:text-6xl">
               SIPADU <span className="text-[#F59E0B]">HUKUM</span>
             </h1>
             <p className="mx-auto max-w-2xl text-lg text-red-100/90 md:text-xl">
-              Portal resmi Komisi Pemilihan Umum Kota Dumai untuk akses regulasi dan produk hukum yang mudah, cepat, dan akurat.
+              {t.home.heroTitle}
             </p>
           </div>
 
@@ -42,7 +44,7 @@ export default async function HomePage() {
           </div>
           <div>
             <p className="text-2xl font-bold text-slate-900">{latestPkpu.length}+</p>
-            <p className="text-sm font-medium text-slate-500">Regulasi Terdaftar</p>
+            <p className="text-sm font-medium text-slate-500">{t.home.registeredRegulations}</p>
           </div>
         </div>
         <div className="flex items-center gap-4 rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md">
@@ -51,7 +53,7 @@ export default async function HomePage() {
           </div>
           <div>
             <p className="text-2xl font-bold text-slate-900">24/7</p>
-            <p className="text-sm font-medium text-slate-500">Akses Informasi Publik</p>
+            <p className="text-sm font-medium text-slate-500">{t.home.publicAccess}</p>
           </div>
         </div>
         <div className="flex items-center gap-4 rounded-2xl bg-white p-6 shadow-sm transition-all hover:shadow-md">
@@ -60,7 +62,7 @@ export default async function HomePage() {
           </div>
           <div>
             <p className="text-2xl font-bold text-slate-900">{kategori.length}</p>
-            <p className="text-sm font-medium text-slate-500">Kategori Dokumen</p>
+            <p className="text-sm font-medium text-slate-500">{t.home.categoryCount}</p>
           </div>
         </div>
       </div>
@@ -68,8 +70,8 @@ export default async function HomePage() {
       {/* Kategori Section */}
       <section className="space-y-8 px-4">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-slate-900">Eksplorasi Berdasarkan Kategori</h2>
-          <p className="mt-2 text-slate-600">Pilih kategori regulasi untuk memfilter pencarian Anda.</p>
+          <h2 className="text-2xl font-bold text-slate-900">{t.home.exploreCategory}</h2>
+          <p className="mt-2 text-slate-600">{t.home.exploreCategoryDesc}</p>
         </div>
         
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -84,7 +86,7 @@ export default async function HomePage() {
                   <Layers size={20} />
                 </div>
                 <h3 className="font-bold text-slate-900 group-hover:text-red-700">{item.nama}</h3>
-                <p className="text-xs text-slate-500 line-clamp-2">{item.deskripsi || "Dokumen regulasi terkait kategori ini."}</p>
+                <p className="text-xs text-slate-500 line-clamp-2">{item.deskripsi || t.home.defaultCategoryDesc}</p>
               </div>
               <div className="absolute bottom-4 right-4 text-slate-300 transition-transform group-hover:translate-x-1 group-hover:text-red-400">
                 <ArrowRight size={18} />
@@ -94,20 +96,53 @@ export default async function HomePage() {
         </div>
       </section>
 
+      <section className="space-y-6 px-4">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-slate-900">{t.home.featuredSections}</h2>
+          <p className="mt-2 text-slate-600">{t.home.featuredSectionsDesc}</p>
+        </div>
+        <div className="mx-auto grid max-w-4xl grid-cols-1 gap-4 md:grid-cols-2">
+          <Link
+            href="/sk"
+            className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition-all hover:-translate-y-1 hover:shadow-xl hover:ring-red-500"
+          >
+            <div className="space-y-3">
+              <div className="inline-block rounded-lg bg-slate-50 p-2 text-slate-600">
+                <FileText size={20} />
+              </div>
+              <h3 className="font-bold text-slate-900">{t.documents.sk.long}</h3>
+              <p className="text-sm text-slate-500">{t.home.skDesc}</p>
+            </div>
+          </Link>
+          <Link
+            href="/berita-acara"
+            className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition-all hover:-translate-y-1 hover:shadow-xl hover:ring-red-500"
+          >
+            <div className="space-y-3">
+              <div className="inline-block rounded-lg bg-slate-50 p-2 text-slate-600">
+                <FileText size={20} />
+              </div>
+              <h3 className="font-bold text-slate-900">{t.documents["berita-acara"].long}</h3>
+              <p className="text-sm text-slate-500">{t.home.beritaAcaraDesc}</p>
+            </div>
+          </Link>
+        </div>
+      </section>
+
       {/* PKPU Terbaru Section */}
       <section className="space-y-6 px-4">
         <div className="flex items-end justify-between border-b border-slate-200 pb-4">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Produk Hukum Terbaru</h2>
-            <p className="mt-1 text-sm text-slate-600">Daftar regulasi PKPU yang baru saja diterbitkan.</p>
+            <h2 className="text-2xl font-bold text-slate-900">{t.home.latestDocuments}</h2>
+            <p className="mt-1 text-sm text-slate-600">{t.home.latestDocumentsDesc}</p>
           </div>
           <Link href="/pkpu" className="flex items-center gap-1 text-sm font-bold text-red-700 hover:underline">
-            Lihat Semua <ArrowRight size={14} />
+            {t.common.viewAll} <ArrowRight size={14} />
           </Link>
         </div>
 
         {latestPkpu.length === 0 ? (
-          <EmptyState title="Belum ada PKPU" description="Data regulasi akan ditampilkan pada bagian ini." />
+          <EmptyState title={t.home.noPkpu} description={t.home.noPkpuDesc} />
         ) : (
           <div className="grid grid-cols-1 gap-4">
             {latestPkpu.map((item) => (
@@ -130,11 +165,20 @@ export default async function HomePage() {
                     {item.judul}
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Ditetapkan pada: <span className="font-medium">{formatTanggalIndonesia(item.tanggalPenetapan)}</span>
+                    {t.home.setOn}:{" "}
+                    <span className="font-medium">
+                      {locale === "en"
+                        ? new Intl.DateTimeFormat("en-US", {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                          }).format(new Date(item.tanggalPenetapan))
+                        : formatTanggalIndonesia(item.tanggalPenetapan)}
+                    </span>
                   </p>
                 </div>
                 <div className="flex items-center gap-2 rounded-full bg-slate-50 px-4 py-2 text-xs font-bold text-slate-600 transition-colors group-hover:bg-[#B91C1C] group-hover:text-white">
-                  Lihat Detail
+                  {t.home.viewDetail}
                 </div>
               </Link>
             ))}

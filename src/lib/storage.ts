@@ -5,7 +5,7 @@ import { google } from "googleapis";
 
 import { env } from "@/lib/env";
 
-const uploadDirectory = path.join(process.cwd(), "public", "uploads");
+const uploadDirectory = path.join(process.cwd(), "storage", "uploads");
 
 type PdfMetadata = {
   nomor?: string | number;
@@ -21,7 +21,7 @@ async function localStore(file: File): Promise<string> {
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
   const filename = `${Date.now()}-${safeName}`;
   await writeFile(path.join(uploadDirectory, filename), buffer);
-  return `/uploads/${filename}`;
+  return `/api/local-files/${filename}`;
 }
 
 async function gDriveStore(file: File): Promise<string> {

@@ -1,8 +1,9 @@
 import clsx from "clsx";
 
+import { getStatusLabel, type Locale } from "@/lib/i18n";
 import type { StatusHukum } from "@/lib/types";
 
-export function StatusBadge({ status }: { status: StatusHukum }) {
+export function StatusBadge({ status, locale = "id" }: { status: StatusHukum; locale?: Locale }) {
   return (
     <span
       className={clsx(
@@ -14,7 +15,7 @@ export function StatusBadge({ status }: { status: StatusHukum }) {
           : "bg-rose-100 text-rose-900"
       )}
     >
-      {status}
+      {getStatusLabel(locale, status)}
     </span>
   );
 }

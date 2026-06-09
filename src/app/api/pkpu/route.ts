@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { Types } from "mongoose";
 
 import { jsonError, requireAdmin } from "@/lib/api";
-import { getViewerSession } from "@/lib/auth";
+import { getPublicSession } from "@/lib/auth";
 import { connectDb } from "@/lib/db";
 import { buildPkpuFilters } from "@/lib/pkpu-query";
 import { generatePkpuSlug } from "@/lib/utils";
@@ -12,7 +12,7 @@ import { createPkpuSchema } from "@/validators/pkpu";
 
 export async function GET(request: Request) {
   await connectDb();
-  const viewer = await getViewerSession();
+  const viewer = await getPublicSession();
   const { searchParams } = new URL(request.url);
   const page = Number(searchParams.get("page") ?? 1);
   const limit = Math.min(Number(searchParams.get("limit") ?? 20), 100);

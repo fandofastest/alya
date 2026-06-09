@@ -16,13 +16,13 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   const body: unknown = await request.json().catch(() => null);
   if (!body || typeof body !== "object") return jsonError("Data tidak valid.", 400);
 
-  const email = "email" in body ? String((body as { email?: unknown }).email ?? "") : "";
+  const nip = "nip" in body ? String((body as { nip?: unknown }).nip ?? "") : "";
   const nama = "nama" in body ? String((body as { nama?: unknown }).nama ?? "") : "";
   const password = "password" in body ? String((body as { password?: unknown }).password ?? "") : "";
   const isActiveRaw = "isActive" in body ? (body as { isActive?: unknown }).isActive : undefined;
   const isActive = typeof isActiveRaw === "boolean" ? isActiveRaw : undefined;
 
-  if (!email.trim() || !email.includes("@")) return jsonError("Email tidak valid.", 400);
+  if (!nip.trim()) return jsonError("NIP wajib diisi.", 400);
   if (!nama.trim()) return jsonError("Nama wajib diisi.", 400);
   if (password && password.length < 6) return jsonError("Password minimal 6 karakter.", 400);
 
@@ -31,11 +31,11 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   const existing = await UserModel.findById(id);
   if (!existing) return jsonError("User tidak ditemukan.", 404);
 
-  const other = await UserModel.findOne({ email: email.toLowerCase(), _id: { $ne: id } }).select("_id").lean();
-  if (other) return jsonError("Email sudah dipakai user lain.", 400);
+  const other = await UserModel.findOne({ nip: nip.trim(), _id: { $ne: id } }).select("_id").lean();
+  if (other) return jsonError("NIP sudah dipakai user lain.", 400);
 
   existing.set({
-    email: email.toLowerCase(),
+    nip: nip.trim(),
     nama: nama.trim(),
     ...(isActive === undefined ? {} : { isActive }),
   });
@@ -45,7 +45,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   }
 
   await existing.save();
-  return NextResponse.json({ message: "User berhasil diperbarui.", data: { id: existing._id, email: existing.email, nama: existing.nama, isActive: existing.isActive } });
+  return NextResponse.json({ message: "User berhasil diperbarui.", data: { id: existing._id, nip: existing.nip, nama: existing.nama, isActive: existing.isActive } });
 }
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {

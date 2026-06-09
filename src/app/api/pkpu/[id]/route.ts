@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { Types } from "mongoose";
 
 import { jsonError, requireAdmin } from "@/lib/api";
-import { getViewerSession } from "@/lib/auth";
+import { getPublicSession } from "@/lib/auth";
 import { connectDb } from "@/lib/db";
 import { generatePkpuSlug } from "@/lib/utils";
 import { KategoriModel } from "@/models/Kategori";
@@ -19,7 +19,7 @@ async function getPkpuByIdOrSlug(id: string) {
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   await connectDb();
-  const viewer = await getViewerSession();
+  const viewer = await getPublicSession();
   const { id } = await params;
   const doc = await getPkpuByIdOrSlug(id);
   if (doc && (doc as { visibility?: string }).visibility === "private" && !viewer) {

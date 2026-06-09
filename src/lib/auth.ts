@@ -21,7 +21,7 @@ type AdminJwtPayload = {
 
 type UserJwtPayload = {
   sub: string;
-  email: string;
+  nip: string;
   role: "user";
 };
 
@@ -86,9 +86,9 @@ export function clearAdminAuthCookie(response: NextResponse) {
   });
 }
 
-export async function verifyUserCredentials(email: string, password: string) {
+export async function verifyUserCredentials(nip: string, password: string) {
   await connectDb();
-  const user = await UserModel.findOne({ email: email.toLowerCase(), isActive: true });
+  const user = await UserModel.findOne({ nip: nip.trim(), isActive: true });
   if (!user) return null;
   const isValid = await bcrypt.compare(password, user.passwordHash);
   if (!isValid) return null;
@@ -112,6 +112,10 @@ export async function getUserSession() {
   const token = cookieStore.get(USER_TOKEN_COOKIE_NAME)?.value;
   if (!token) return null;
   return verifyUserToken(token);
+}
+
+export async function getPublicSession() {
+  return getUserSession();
 }
 
 export async function getViewerSession() {

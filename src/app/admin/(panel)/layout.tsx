@@ -3,17 +3,21 @@ import { redirect } from "next/navigation";
 
 import { AdminLogoutButton } from "@/components/admin/AdminLogoutButton";
 import { getAdminSession } from "@/lib/auth";
-
-const navLinks = [
-  { href: "/admin", label: "Dashboard" },
-  { href: "/admin/pkpu", label: "PKPU" },
-  { href: "/admin/kategori", label: "Kategori" },
-  { href: "/admin/users", label: "User" },
-];
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
+import { getI18n } from "@/lib/i18n-server";
 
 export default async function AdminPanelLayout({ children }: { children: React.ReactNode }) {
+  const { locale, t } = await getI18n();
   const session = await getAdminSession();
   if (!session) redirect("/admin/login");
+  const navLinks = [
+    { href: "/admin", label: t.nav.dashboard },
+    { href: "/admin/pkpu", label: "PKPU" },
+    { href: "/admin/sk", label: t.nav.sk },
+    { href: "/admin/berita-acara", label: t.nav.beritaAcara },
+    { href: "/admin/kategori", label: t.nav.categories },
+    { href: "/admin/users", label: t.nav.users },
+  ];
 
   return (
     <div className="min-h-screen bg-[#F3F4F6] text-slate-900">
@@ -23,14 +27,19 @@ export default async function AdminPanelLayout({ children }: { children: React.R
             <img src="/logo.png" alt="Logo KPU" className="h-10 w-auto" />
             <div className="space-y-1">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-600 leading-none">
-                Panel Administrasi
+                {t.admin.panel}
               </p>
-              <h1 className="text-lg font-black text-[#B91C1C] leading-none">SIPADU HUKUM</h1>
+              <h1 className="text-lg font-black text-[#B91C1C] leading-none">{t.appName}</h1>
             </div>
           </div>
           <div className="flex items-center gap-4">
+            <LanguageSwitcher locale={locale} label={t.nav.language} variant="dark" />
             <p className="hidden text-sm text-slate-600 md:block">{session.email}</p>
-            <AdminLogoutButton />
+            <AdminLogoutButton
+              idleLabel={t.nav.logout}
+              loadingLabel={t.common.loading}
+              errorLabel={locale === "en" ? "Logout failed. Please try again." : "Logout gagal. Silakan coba lagi."}
+            />
           </div>
         </div>
         <div className="border-t border-slate-200 bg-slate-50">
@@ -44,7 +53,7 @@ export default async function AdminPanelLayout({ children }: { children: React.R
               href="/"
               className="ml-auto rounded border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:border-slate-400"
             >
-              Lihat Situs Publik
+              {t.nav.publicSite}
             </Link>
           </nav>
         </div>

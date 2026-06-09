@@ -31,7 +31,7 @@ export default async function AdminUsersPage() {
           <table className="min-w-full divide-y divide-slate-200 text-sm text-left">
             <thead className="bg-slate-50 font-semibold text-slate-700">
               <tr>
-                <th className="px-6 py-4">Email</th>
+                    <th className="px-6 py-4">NIP</th>
                 <th className="px-6 py-4">Nama</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4">Dibuat</th>
@@ -48,7 +48,7 @@ export default async function AdminUsersPage() {
               ) : (
                 users.map((u) => (
                   <tr key={u._id.toString()} className="hover:bg-slate-50">
-                    <td className="px-6 py-4 text-slate-900 font-medium">{u.email}</td>
+                    <td className="px-6 py-4 text-slate-900 font-medium">{u.nip}</td>
                     <td className="px-6 py-4 text-slate-700">{u.nama}</td>
                     <td className="px-6 py-4">
                       <span
@@ -69,7 +69,7 @@ export default async function AdminUsersPage() {
                       >
                         Edit
                       </Link>
-                      <UserDeleteButton id={u._id.toString()} email={u.email} />
+                      <UserDeleteButton id={u._id.toString()} nip={u.nip} />
                     </td>
                   </tr>
                 ))

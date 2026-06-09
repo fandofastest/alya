@@ -15,7 +15,7 @@ export default async function AdminUserEditPage({ params }: { params: Promise<{ 
     <div className="space-y-6">
       <section className="rounded-lg bg-white p-6 shadow-sm">
         <h2 className="text-xl font-bold text-[#B91C1C]">Edit User</h2>
-        <p className="mt-1 text-sm text-slate-600">Perbarui informasi user: {user.email}</p>
+        <p className="mt-1 text-sm text-slate-600">Perbarui informasi user: {user.nip}</p>
       </section>
 
       <section className="mx-auto max-w-2xl rounded-lg bg-white p-8 shadow-sm">
@@ -23,7 +23,7 @@ export default async function AdminUserEditPage({ params }: { params: Promise<{ 
           mode="edit"
           id={id}
           initial={{
-            email: user.email,
+            nip: user.nip,
             nama: user.nama,
             isActive: user.isActive ?? true,
           }}

@@ -8,9 +8,26 @@ export function generatePkpuSlug(judul: string, nomor: number, tahun: number) {
   });
 }
 
+export function generateDocumentSlug(judul: string, nomor: string) {
+  return slugify(`${judul}-${nomor}`, {
+    lower: true,
+    strict: true,
+    trim: true,
+  });
+}
+
 export function formatTanggalIndonesia(date: Date | string) {
   const parsed = typeof date === "string" ? new Date(date) : date;
   return new Intl.DateTimeFormat("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  }).format(parsed);
+}
+
+export function formatTanggal(date: Date | string, locale: "id" | "en") {
+  const parsed = typeof date === "string" ? new Date(date) : date;
+  return new Intl.DateTimeFormat(locale === "en" ? "en-US" : "id-ID", {
     day: "2-digit",
     month: "long",
     year: "numeric",

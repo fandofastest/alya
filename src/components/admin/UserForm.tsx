@@ -7,11 +7,11 @@ import { toast } from "sonner";
 export function UserForm(props: {
   mode: "create" | "edit";
   id?: string;
-  initial?: { email: string; nama: string; isActive: boolean };
+  initial?: { nip: string; nama: string; isActive: boolean };
 }) {
   const router = useRouter();
   const [values, setValues] = useState({
-    email: props.initial?.email ?? "",
+    nip: props.initial?.nip ?? "",
     nama: props.initial?.nama ?? "",
     password: "",
     isActive: props.initial?.isActive ?? true,
@@ -23,7 +23,7 @@ export function UserForm(props: {
     event.preventDefault();
     setError(null);
 
-    if (!values.email.trim()) return setError("Email wajib diisi.");
+    if (!values.nip.trim()) return setError("NIP wajib diisi.");
     if (!values.nama.trim()) return setError("Nama wajib diisi.");
     if (props.mode === "create" && values.password.length < 6) return setError("Password minimal 6 karakter.");
     if (props.mode === "edit" && values.password && values.password.length < 6) return setError("Password minimal 6 karakter.");
@@ -33,7 +33,7 @@ export function UserForm(props: {
       const endpoint = props.mode === "create" ? "/api/users" : `/api/users/${props.id}`;
       const method = props.mode === "create" ? "POST" : "PUT";
       const payload = {
-        email: values.email.trim(),
+        nip: values.nip.trim(),
         nama: values.nama.trim(),
         password: values.password ? values.password : undefined,
         isActive: values.isActive,
@@ -65,13 +65,13 @@ export function UserForm(props: {
       {error && <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</div>}
 
       <div className="space-y-1">
-        <label className="text-sm font-semibold text-slate-700">Email</label>
+        <label className="text-sm font-semibold text-slate-700">NIP</label>
         <input
-          type="email"
-          value={values.email}
-          onChange={(e) => setValues({ ...values, email: e.target.value })}
+          type="text"
+          value={values.nip}
+          onChange={(e) => setValues({ ...values, nip: e.target.value })}
           className="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-[#B91C1C] focus:outline-none"
-          placeholder="user@kpu.go.id"
+          placeholder="Masukkan NIP"
           required
         />
       </div>

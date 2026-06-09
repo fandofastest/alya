@@ -3,6 +3,7 @@ import { getViewerSession } from "@/lib/auth";
 import { connectDb } from "@/lib/db";
 import { env } from "@/lib/env";
 import { PkpuModel } from "@/models/Pkpu";
+import { SimpleDocumentModel } from "@/models/SimpleDocument";
 
 export async function GET(
   _request: Request,
@@ -15,12 +16,16 @@ export async function GET(
   }
 
   await connectDb();
-  const pkpu = await PkpuModel.findOne({ fileUrl: `/api/pkpu/file/${id}` }).select("visibility").lean();
-  if (!pkpu) {
-    return new Response("PKPU tidak ditemukan.", { status: 404 });
+  const [pkpu, simpleDocument] = await Promise.all([
+    PkpuModel.findOne({ fileUrl: `/api/pkpu/file/${id}` }).select("visibility").lean(),
+    SimpleDocumentModel.findOne({ fileUrl: `/api/pkpu/file/${id}` }).select("visibility").lean(),
+  ]);
+  const owner = pkpu ?? simpleDocument;
+  if (!owner) {
+    return new Response("Dokumen tidak ditemukan.", { status: 404 });
   }
 
-  const isPrivate = (pkpu as { visibility?: string }).visibility === "private";
+  const isPrivate = owner.visibility === "private";
   if (isPrivate) {
     const viewer = await getViewerSession();
     if (!viewer) {

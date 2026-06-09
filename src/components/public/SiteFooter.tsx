@@ -1,6 +1,10 @@
 import { Mail, MapPin } from "lucide-react";
 
-export function SiteFooter() {
+import { getI18n } from "@/lib/i18n-server";
+
+export async function SiteFooter() {
+  const { t } = await getI18n();
+
   return (
     <footer className="mt-20 border-t border-slate-200 bg-white">
       <div className="mx-auto max-w-6xl px-4 py-12 md:py-16">
@@ -12,18 +16,17 @@ export function SiteFooter() {
                 S
               </div>
               <span className="text-xl font-bold tracking-tight text-[#B91C1C]">
-                SIPADU <span className="text-[#F59E0B]">HUKUM</span>
+                {t.appName.split(" ")[0]} <span className="text-[#F59E0B]">{t.appName.split(" ")[1]}</span>
               </span>
             </div>
             <p className="text-sm leading-relaxed text-slate-500">
-              Sistem Informasi Terpadu Produk Hukum (SIPADU HUKUM) Komisi Pemilihan Umum Kota Dumai.
-              Menyediakan akses mudah ke berbagai regulasi dan produk hukum resmi.
+              {t.footer.about}
             </p>
           </div>
 
           {/* Contact Column */}
           <div className="space-y-4">
-            <h4 className="text-sm font-bold uppercase tracking-wider text-slate-900">Kontak Kami</h4>
+            <h4 className="text-sm font-bold uppercase tracking-wider text-slate-900">{t.footer.contactUs}</h4>
             <div className="space-y-3">
               <div className="flex items-start gap-3 text-sm text-slate-600">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-[#F59E0B]" />
@@ -42,11 +45,10 @@ export function SiteFooter() {
 
           {/* Quick Links / Social / Info */}
           <div className="space-y-4">
-            <h4 className="text-sm font-bold uppercase tracking-wider text-slate-900">Informasi</h4>
+            <h4 className="text-sm font-bold uppercase tracking-wider text-slate-900">{t.footer.information}</h4>
             <div className="rounded-xl bg-slate-50 p-4">
               <p className="text-xs font-medium text-slate-500">
-                &copy; {new Date().getFullYear()} KPU Kota Dumai. Seluruh hak cipta dilindungi. 
-                Data regulasi diperbarui secara berkala sesuai dengan ketetapan resmi.
+                &copy; {new Date().getFullYear()} {t.footer.copyright}
               </p>
             </div>
           </div>
@@ -56,7 +58,7 @@ export function SiteFooter() {
       <div className="border-t border-slate-100 bg-slate-50 py-4">
         <div className="mx-auto max-w-6xl px-4 text-center">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
-            SIPADU HUKUM - Komisi Pemilihan Umum Kota Dumai
+            {t.footer.tagline}
           </p>
         </div>
       </div>

@@ -274,7 +274,11 @@ export default async function AdminPkpuListPage(props: { searchParams: Promise<S
                         >
                           Edit
                         </Link>
-                        <a href={item.fileUrl} className="text-sm font-semibold text-slate-700 hover:underline" download>
+                        <a
+                          href={`/api/pkpu/${item._id.toString()}/download`}
+                          className="text-sm font-semibold text-slate-700 hover:underline"
+                          download
+                        >
                           Download
                         </a>
                         <PkpuDeleteButton id={item._id.toString()} />

@@ -3,7 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export function AdminLogoutButton() {
+export function AdminLogoutButton(props: {
+  idleLabel: string;
+  loadingLabel: string;
+  errorLabel: string;
+}) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -15,12 +19,12 @@ export function AdminLogoutButton() {
     try {
       const response = await fetch("/api/auth/logout", { method: "POST" });
       if (!response.ok) {
-        setError("Logout gagal. Silakan coba lagi.");
+        setError(props.errorLabel);
         return;
       }
       router.replace("/admin/login");
     } catch {
-      setError("Logout gagal. Silakan coba lagi.");
+      setError(props.errorLabel);
     } finally {
       setIsLoading(false);
     }
@@ -35,7 +39,7 @@ export function AdminLogoutButton() {
         disabled={isLoading}
         className="rounded border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:border-slate-400 disabled:opacity-60"
       >
-        {isLoading ? "Memproses..." : "Logout"}
+        {isLoading ? props.loadingLabel : props.idleLabel}
       </button>
     </div>
   );

@@ -13,7 +13,7 @@ import Link from "next/link";
 
 import { EmptyState } from "@/components/public/EmptyState";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { getViewerSession } from "@/lib/auth";
+import { getPublicSession } from "@/lib/auth";
 import { connectDb } from "@/lib/db";
 import { formatTanggalIndonesia } from "@/lib/utils";
 import { KategoriModel } from "@/models/Kategori";
@@ -32,7 +32,7 @@ type SearchParams = {
 export default async function PkpuListPage(props: { searchParams: Promise<SearchParams> }) {
   await connectDb();
   const searchParams = await props.searchParams;
-  const viewer = await getViewerSession();
+  const viewer = await getPublicSession();
 
   const filter: Record<string, unknown> = { isActive: true };
   if (searchParams.q) filter.$text = { $search: searchParams.q };

@@ -1,16 +1,20 @@
 import Link from "next/link";
 
 import { getUserSession } from "@/lib/auth";
+import { LanguageSwitcher } from "@/components/ui/LanguageSwitcher";
+import { getI18n } from "@/lib/i18n-server";
 import { UserLogoutButton } from "@/components/public/UserLogoutButton";
 
-const links = [
-  { href: "/", label: "Beranda" },
-  { href: "/pkpu", label: "Direktori" },
-  { href: "/bantuan", label: "Bantuan" },
-];
-
 export async function SiteHeader() {
+  const { locale, t } = await getI18n();
   const session = await getUserSession();
+  const links = [
+    { href: "/", label: t.nav.home },
+    { href: "/pkpu", label: t.nav.directory },
+    { href: "/sk", label: t.nav.sk },
+    { href: "/berita-acara", label: t.nav.beritaAcara },
+    { href: "/bantuan", label: t.nav.help },
+  ];
 
   return (
     <header className="border-b border-slate-200 bg-white">
@@ -22,7 +26,7 @@ export async function SiteHeader() {
               KPU KOTA DUMAI
             </p>
             <h1 className="text-xl font-black tracking-tight text-[#B91C1C]">
-              SIPADU <span className="text-[#F59E0B]">HUKUM</span>
+              {t.appName.split(" ")[0]} <span className="text-[#F59E0B]">{t.appName.split(" ")[1]}</span>
             </h1>
           </div>
         </Link>
@@ -32,14 +36,15 @@ export async function SiteHeader() {
               {link.label}
             </Link>
           ))}
+          <LanguageSwitcher locale={locale} label={t.nav.language} />
           {session ? (
             <div className="flex items-center gap-3">
-              <span className="hidden text-sm text-slate-600 md:block">{session.email}</span>
-              <UserLogoutButton />
+              <span className="hidden text-sm text-slate-600 md:block">{session.nip}</span>
+              <UserLogoutButton idleLabel={t.nav.logout} />
             </div>
           ) : (
             <Link href="/login" className="rounded bg-[#B91C1C] px-3 py-1.5 text-sm font-semibold text-white">
-              Login
+              {t.nav.login}
             </Link>
           )}
         </nav>

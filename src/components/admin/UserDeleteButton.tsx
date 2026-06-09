@@ -4,12 +4,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export function UserDeleteButton({ id, email }: { id: string; email: string }) {
+export function UserDeleteButton({ id, nip }: { id: string; nip: string }) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
 
   async function handleDelete() {
-    if (!confirm(`Apakah Anda yakin ingin menghapus user "${email}"?`)) return;
+    if (!confirm(`Apakah Anda yakin ingin menghapus user dengan NIP "${nip}"?`)) return;
 
     setIsDeleting(true);
     try {

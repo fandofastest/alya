@@ -1,5 +1,5 @@
 import { connectDb } from "@/lib/db";
-import { getViewerSession } from "@/lib/auth";
+import { getPublicSession } from "@/lib/auth";
 import { KategoriModel } from "@/models/Kategori";
 import { PkpuModel } from "@/models/Pkpu";
 
@@ -10,7 +10,7 @@ export async function getKategoriList() {
 
 export async function getLatestPkpu(limit = 8) {
   await connectDb();
-  const viewer = await getViewerSession();
+  const viewer = await getPublicSession();
   return PkpuModel.find({ isActive: true, ...(viewer ? {} : { visibility: { $ne: "private" } }) })
     .populate("kategori")
     .sort({ createdAt: -1 })
@@ -20,7 +20,7 @@ export async function getLatestPkpu(limit = 8) {
 
 export async function getPkpuBySlug(slug: string) {
   await connectDb();
-  const viewer = await getViewerSession();
+  const viewer = await getPublicSession();
   return PkpuModel.findOne({ slug, isActive: true, ...(viewer ? {} : { visibility: { $ne: "private" } }) })
     .populate("kategori")
     .populate("parentId")
@@ -29,7 +29,7 @@ export async function getPkpuBySlug(slug: string) {
 
 export async function getRevisiListByParent(parentId: string) {
   await connectDb();
-  const viewer = await getViewerSession();
+  const viewer = await getPublicSession();
   return PkpuModel.find({ parentId, isActive: true, ...(viewer ? {} : { visibility: { $ne: "private" } }) })
     .sort({ tahun: -1, nomor: -1 })
     .lean();
@@ -53,7 +53,7 @@ export async function getPkpuByKategoriSlug(slug: string) {
   const data = await PkpuModel.find({
     kategori: kategoriIds.length > 1 ? { $in: kategoriIds } : kategori._id,
     isActive: true,
-    ...((await getViewerSession()) ? {} : { visibility: { $ne: "private" } }),
+    ...((await getPublicSession()) ? {} : { visibility: { $ne: "private" } }),
   })
     .sort({ tahun: -1, nomor: -1 })
     .lean();
