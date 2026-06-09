@@ -1,6 +1,11 @@
 import { KategoriForm } from "@/components/admin/KategoriForm";
+import { connectDb } from "@/lib/db";
+import { KategoriModel } from "@/models/Kategori";
 
-export default function AdminKategoriCreatePage() {
+export default async function AdminKategoriCreatePage() {
+  await connectDb();
+  const parentOptions = await KategoriModel.find().sort({ nama: 1 }).select("_id nama").lean();
+
   return (
     <div className="space-y-6">
       <section className="rounded-lg bg-white p-6 shadow-sm">
@@ -9,7 +14,10 @@ export default function AdminKategoriCreatePage() {
       </section>
 
       <section className="mx-auto max-w-2xl rounded-lg bg-white p-8 shadow-sm">
-        <KategoriForm mode="create" />
+        <KategoriForm
+          mode="create"
+          parentOptions={parentOptions.map((k) => ({ _id: k._id.toString(), nama: k.nama }))}
+        />
       </section>
     </div>
   );

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Types } from "mongoose";
 
 import { jsonError, requireAdmin } from "@/lib/api";
+import { getViewerSession } from "@/lib/auth";
 import { connectDb } from "@/lib/db";
 import { generatePkpuSlug } from "@/lib/utils";
 import { KategoriModel } from "@/models/Kategori";
@@ -18,8 +19,12 @@ async function getPkpuByIdOrSlug(id: string) {
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   await connectDb();
+  const viewer = await getViewerSession();
   const { id } = await params;
   const doc = await getPkpuByIdOrSlug(id);
+  if (doc && (doc as { visibility?: string }).visibility === "private" && !viewer) {
+    return jsonError("PKPU tidak ditemukan.", 404);
+  }
   if (!doc) return jsonError("PKPU tidak ditemukan.", 404);
   return NextResponse.json({ data: doc });
 }
@@ -40,13 +45,13 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   }
 
   const payload = parseResult.data;
-  payload.parentId = payload.statusHukum === "berlaku" ? null : payload.parentId;
+  payload.parentId = payload.statusHukum === "revisi" ? payload.parentId : null;
 
   if (!(await KategoriModel.exists({ _id: payload.kategori }))) {
     return jsonError("Kategori tidak ditemukan.", 404);
   }
 
-  if (payload.statusHukum === "revisi" || payload.statusHukum === "dicabut") {
+  if (payload.statusHukum === "revisi") {
     if (!payload.parentId || !Types.ObjectId.isValid(payload.parentId)) {
       return jsonError("Parent PKPU tidak valid.", 400);
     }

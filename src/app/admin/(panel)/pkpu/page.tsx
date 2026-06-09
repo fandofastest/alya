@@ -13,6 +13,7 @@ type SearchParams = {
   tahun?: string;
   statusHukum?: "berlaku" | "revisi" | "dicabut";
   kategori?: string;
+  visibility?: "public" | "private";
   isActive?: "true" | "false";
   page?: string;
 };
@@ -23,6 +24,7 @@ function buildSearchParamsObject(searchParams: SearchParams) {
   if (searchParams.tahun) sp.set("tahun", searchParams.tahun);
   if (searchParams.statusHukum) sp.set("statusHukum", searchParams.statusHukum);
   if (searchParams.kategori) sp.set("kategori", searchParams.kategori);
+  if (searchParams.visibility) sp.set("visibility", searchParams.visibility);
   if (searchParams.isActive) sp.set("isActive", searchParams.isActive);
   return sp;
 }
@@ -37,7 +39,7 @@ export default async function AdminPkpuListPage(props: { searchParams: Promise<S
 
   const { filter, query } = buildPkpuFilters(buildSearchParamsObject(searchParams));
 
-  const [data, total, kategoriList] = await Promise.all([
+  const [data, total, kategoriDocs] = await Promise.all([
     PkpuModel.find(filter)
       .populate("kategori")
       .populate("parentId", "nomor tahun slug judul")
@@ -46,8 +48,39 @@ export default async function AdminPkpuListPage(props: { searchParams: Promise<S
       .limit(limit)
       .lean(),
     PkpuModel.countDocuments(filter),
-    KategoriModel.find().sort({ nama: 1 }).lean(),
+    KategoriModel.find().sort({ nama: 1 }).select("_id nama parentId").lean(),
   ]);
+
+  const kategoriById = new Map<string, (typeof kategoriDocs)[number]>();
+  for (const k of kategoriDocs) kategoriById.set(k._id.toString(), k);
+
+  const childrenByParent = new Map<string, (typeof kategoriDocs)[number][]>();
+  const roots: (typeof kategoriDocs)[number][] = [];
+  for (const k of kategoriDocs) {
+    const parentKey = k.parentId ? k.parentId.toString() : "";
+    if (!parentKey || !kategoriById.has(parentKey)) {
+      roots.push(k);
+      continue;
+    }
+    const arr = childrenByParent.get(parentKey) ?? [];
+    arr.push(k);
+    childrenByParent.set(parentKey, arr);
+  }
+
+  const kategoriOptions: Array<{ _id: string; label: string }> = [];
+  const pushOptions = (items: (typeof kategoriDocs)[number][], depth: number) => {
+    const sorted = [...items].sort((a, b) => a.nama.localeCompare(b.nama));
+    for (const item of sorted) {
+      const prefix = "\u00A0\u00A0\u00A0".repeat(depth);
+      kategoriOptions.push({
+        _id: item._id.toString(),
+        label: `${prefix}${item.nama}`,
+      });
+      const children = childrenByParent.get(item._id.toString());
+      if (children && children.length > 0) pushOptions(children, depth + 1);
+    }
+  };
+  pushOptions(roots, 0);
 
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
@@ -98,11 +131,20 @@ export default async function AdminPkpuListPage(props: { searchParams: Promise<S
             className="rounded border border-slate-300 px-3 py-2 text-sm"
           >
             <option value="">Semua Kategori</option>
-            {kategoriList.map((k) => (
-              <option key={k._id.toString()} value={k._id.toString()}>
-                {k.nama}
+            {kategoriOptions.map((k) => (
+              <option key={k._id} value={k._id}>
+                {k.label}
               </option>
             ))}
+          </select>
+          <select
+            name="visibility"
+            defaultValue={searchParams.visibility ?? ""}
+            className="rounded border border-slate-300 px-3 py-2 text-sm"
+          >
+            <option value="">Semua Visibility</option>
+            <option value="public">Public</option>
+            <option value="private">Private</option>
           </select>
           <select
             name="isActive"
@@ -166,6 +208,7 @@ export default async function AdminPkpuListPage(props: { searchParams: Promise<S
                 <th className="px-4 py-3">Tentang</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Kategori</th>
+                <th className="px-4 py-3">Visibility</th>
                 <th className="px-4 py-3">Relasi</th>
                 <th className="px-4 py-3">Publikasi</th>
                 <th className="px-4 py-3">Diperbarui</th>
@@ -189,10 +232,21 @@ export default async function AdminPkpuListPage(props: { searchParams: Promise<S
                       <StatusBadge status={item.statusHukum} />
                     </td>
                     <td className="px-4 py-3">{kategori?.nama ?? "-"}</td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`rounded px-2 py-1 text-xs font-semibold ${
+                          (item as { visibility?: string }).visibility === "private"
+                            ? "bg-amber-50 text-amber-800"
+                            : "bg-slate-100 text-slate-700"
+                        }`}
+                      >
+                        {(item as { visibility?: string }).visibility === "private" ? "Private" : "Public"}
+                      </span>
+                    </td>
                     <td className="px-4 py-3 text-xs text-slate-600">
-                      {(item.statusHukum === "revisi" || item.statusHukum === "dicabut") && parent ? (
+                      {item.statusHukum === "revisi" && parent ? (
                         <span>
-                          {item.statusHukum === "revisi" ? "Revisi dari" : "Mencabut"} {parent.nomor}/{parent.tahun}
+                          Revisi dari {parent.nomor}/{parent.tahun}
                         </span>
                       ) : item.statusHukum === "berlaku" || item.statusHukum === "induk" ? (
                         <span>Induk</span>

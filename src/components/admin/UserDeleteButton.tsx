@@ -4,24 +4,22 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export function KategoriDeleteButton({ id, nama }: { id: string; nama: string }) {
+export function UserDeleteButton({ id, email }: { id: string; email: string }) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
 
   async function handleDelete() {
-    if (!confirm(`Apakah Anda yakin ingin menghapus kategori "${nama}"?`)) return;
+    if (!confirm(`Apakah Anda yakin ingin menghapus user "${email}"?`)) return;
 
     setIsDeleting(true);
     try {
-      const res = await fetch(`/api/kategori/${id}`, { method: "DELETE" });
-      const data = await res.json();
-
-      if (!res.ok) throw new Error(data.message || "Gagal menghapus kategori.");
-
-      toast.success(data.message);
+      const res = await fetch(`/api/users/${id}`, { method: "DELETE" });
+      const data = (await res.json().catch(() => null)) as { message?: string } | null;
+      if (!res.ok) throw new Error(data?.message ?? "Gagal menghapus user.");
+      toast.success(data?.message ?? "User berhasil dihapus.");
       router.refresh();
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Gagal menghapus kategori.";
+      const message = err instanceof Error ? err.message : "Gagal menghapus user.";
       toast.error(message);
     } finally {
       setIsDeleting(false);

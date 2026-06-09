@@ -8,7 +8,10 @@ export default async function AdminKategoriEditPage({ params }: { params: Promis
   const { id } = await params;
   
   await connectDb();
-  const kategori = await KategoriModel.findById(id).lean();
+  const [kategori, parentOptions] = await Promise.all([
+    KategoriModel.findById(id).lean(),
+    KategoriModel.find({ _id: { $ne: id } }).sort({ nama: 1 }).select("_id nama").lean(),
+  ]);
 
   if (!kategori) {
     return notFound();
@@ -25,9 +28,11 @@ export default async function AdminKategoriEditPage({ params }: { params: Promis
         <KategoriForm
           mode="edit"
           id={id}
+          parentOptions={parentOptions.map((k) => ({ _id: k._id.toString(), nama: k.nama }))}
           initial={{
             nama: kategori.nama,
             deskripsi: kategori.deskripsi || "",
+            parentId: kategori.parentId ? kategori.parentId.toString() : null,
           }}
         />
       </section>

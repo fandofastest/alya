@@ -5,6 +5,7 @@ export function buildPkpuFilters(searchParams: URLSearchParams) {
   const tahun = searchParams.get("tahun");
   const statusHukum = searchParams.get("statusHukum");
   const kategori = searchParams.get("kategori");
+  const visibility = searchParams.get("visibility");
   const isActive = searchParams.get("isActive");
 
   const filter: Record<string, unknown> = {};
@@ -25,6 +26,10 @@ export function buildPkpuFilters(searchParams: URLSearchParams) {
 
   if (kategori && Types.ObjectId.isValid(kategori)) {
     filter.kategori = new Types.ObjectId(kategori);
+  }
+
+  if (visibility === "public" || visibility === "private") {
+    filter.visibility = visibility;
   }
 
   if (isActive === "true") filter.isActive = true;

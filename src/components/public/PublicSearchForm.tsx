@@ -41,21 +41,21 @@ export function PublicSearchForm() {
           onClick={() => setQuery("2024")}
           className="hover:text-white hover:underline"
         >
-          "2024"
+          &quot;2024&quot;
         </button>
         <button
           type="button"
           onClick={() => setQuery("Logistik")}
           className="hover:text-white hover:underline"
         >
-          "Logistik"
+          &quot;Logistik&quot;
         </button>
         <button
           type="button"
           onClick={() => setQuery("Tahun 2023")}
           className="hover:text-white hover:underline"
         >
-          "Tahun 2023"
+          &quot;Tahun 2023&quot;
         </button>
       </div>
     </form>

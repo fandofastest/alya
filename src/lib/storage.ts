@@ -7,6 +7,13 @@ import { env } from "@/lib/env";
 
 const uploadDirectory = path.join(process.cwd(), "public", "uploads");
 
+type PdfMetadata = {
+  nomor?: string | number;
+  tanggalPenetapan?: string;
+  judul?: string;
+  tahun?: string | number;
+};
+
 async function localStore(file: File): Promise<string> {
   await mkdir(uploadDirectory, { recursive: true });
   const bytes = await file.arrayBuffer();
@@ -66,7 +73,7 @@ async function gDriveStore(file: File): Promise<string> {
   return response.data.webViewLink || "";
 }
 
-async function externalStore(file: File, metadata: any): Promise<string> {
+async function externalStore(file: File, metadata: PdfMetadata): Promise<string> {
   if (!env.EXTERNAL_UPLOAD_TOKEN) {
     throw new Error("External upload token tidak ditemukan.");
   }
@@ -75,10 +82,10 @@ async function externalStore(file: File, metadata: any): Promise<string> {
   formData.append("file", file);
   formData.append("senderName", "Portal ALYA");
   formData.append("uploaderPhone", "081378949932");
-  formData.append("docNumber", metadata.nomor || "");
+  formData.append("docNumber", metadata.nomor == null ? "" : String(metadata.nomor));
   formData.append("docDate", metadata.tanggalPenetapan || new Date().toISOString());
   formData.append("title", metadata.judul || "");
-  formData.append("year", String(metadata.tahun || ""));
+  formData.append("year", metadata.tahun == null ? "" : String(metadata.tahun));
   formData.append("sourceType", "api");
   formData.append("caption", metadata.judul || "");
   formData.append("description", metadata.judul || "");
@@ -93,8 +100,12 @@ async function externalStore(file: File, metadata: any): Promise<string> {
   });
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `External upload failed with status ${response.status}`);
+    const errorData: unknown = await response.json().catch(() => null);
+    const message =
+      typeof errorData === "object" && errorData && "message" in errorData
+        ? String((errorData as { message: unknown }).message)
+        : `External upload failed with status ${response.status}`;
+    throw new Error(message);
   }
 
   const result = await response.json();
@@ -111,7 +122,7 @@ async function mockExternalStore(file: File): Promise<string> {
   return localStore(file);
 }
 
-export async function storePdfFile(file: File, metadata: any = {}): Promise<string> {
+export async function storePdfFile(file: File, metadata: PdfMetadata = {}): Promise<string> {
   if (env.STORAGE_DRIVER === "external") {
     return externalStore(file, metadata);
   }

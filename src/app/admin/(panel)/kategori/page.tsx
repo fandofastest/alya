@@ -10,6 +10,34 @@ export default async function AdminKategoriPage() {
   await connectDb();
   const kategori = await KategoriModel.find().sort({ nama: 1 }).lean();
 
+  const byId = new Map<string, (typeof kategori)[number]>();
+  for (const k of kategori) byId.set(k._id.toString(), k);
+
+  const childrenByParent = new Map<string, (typeof kategori)[number][]>();
+  const roots: (typeof kategori)[number][] = [];
+  for (const k of kategori) {
+    const parentKey = k.parentId ? k.parentId.toString() : "";
+    if (!parentKey) {
+      roots.push(k);
+      continue;
+    }
+    const arr = childrenByParent.get(parentKey) ?? [];
+    arr.push(k);
+    childrenByParent.set(parentKey, arr);
+  }
+
+  const rows: Array<{ item: (typeof kategori)[number]; depth: number; parentName: string | null }> = [];
+  const pushRows = (items: (typeof kategori)[number][], depth: number) => {
+    const sorted = [...items].sort((a, b) => a.nama.localeCompare(b.nama));
+    for (const item of sorted) {
+      const parentName = item.parentId ? byId.get(item.parentId.toString())?.nama ?? null : null;
+      rows.push({ item, depth, parentName });
+      const children = childrenByParent.get(item._id.toString());
+      if (children && children.length > 0) pushRows(children, depth + 1);
+    }
+  };
+  pushRows(roots, 0);
+
   return (
     <div className="space-y-6">
       <section className="flex items-center justify-between rounded-lg bg-white p-6 shadow-sm">
@@ -31,22 +59,26 @@ export default async function AdminKategoriPage() {
             <thead className="bg-slate-50 font-semibold text-slate-700">
               <tr>
                 <th className="px-6 py-4">Nama Kategori</th>
+                <th className="px-6 py-4">Parent</th>
                 <th className="px-6 py-4">Slug</th>
                 <th className="px-6 py-4">Deskripsi</th>
                 <th className="px-6 py-4 text-right">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 bg-white">
-              {kategori.length === 0 ? (
+              {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-10 text-center text-slate-500 italic">
+                  <td colSpan={5} className="px-6 py-10 text-center text-slate-500 italic">
                     Belum ada kategori yang dibuat.
                   </td>
                 </tr>
               ) : (
-                kategori.map((item) => (
+                rows.map(({ item, depth, parentName }) => (
                   <tr key={item._id.toString()} className="hover:bg-slate-50">
-                    <td className="px-6 py-4 font-medium text-slate-900">{item.nama}</td>
+                    <td className="px-6 py-4 font-medium text-slate-900">
+                      <span className={depth > 0 ? "pl-6" : ""}>{item.nama}</span>
+                    </td>
+                    <td className="px-6 py-4 text-slate-600">{parentName ?? "-"}</td>
                     <td className="px-6 py-4 text-slate-500 font-mono text-xs">{item.slug}</td>
                     <td className="px-6 py-4 text-slate-600 max-w-xs truncate">
                       {item.deskripsi || "-"}

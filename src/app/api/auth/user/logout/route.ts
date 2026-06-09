@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 
-import { clearAdminAuthCookie } from "@/lib/auth";
+import { clearUserAuthCookie } from "@/lib/auth";
 
 export async function POST() {
   const response = NextResponse.json({ message: "Logout berhasil." });
-  clearAdminAuthCookie(response);
+  clearUserAuthCookie(response);
   return response;
 }

@@ -7,12 +7,14 @@ import { toast } from "sonner";
 export function KategoriForm(props: {
   mode: "create" | "edit";
   id?: string;
-  initial?: { nama: string; deskripsi: string };
+  initial?: { nama: string; deskripsi: string; parentId?: string | null };
+  parentOptions: { _id: string; nama: string }[];
 }) {
   const router = useRouter();
   const [values, setValues] = useState({
     nama: props.initial?.nama ?? "",
     deskripsi: props.initial?.deskripsi ?? "",
+    parentId: props.initial?.parentId ?? "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -31,7 +33,11 @@ export function KategoriForm(props: {
       const res = await fetch(endpoint, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify({
+          nama: values.nama,
+          deskripsi: values.deskripsi,
+          parentId: values.parentId ? values.parentId : null,
+        }),
       });
 
       const data = await res.json();
@@ -40,9 +46,10 @@ export function KategoriForm(props: {
       toast.success(data.message);
       router.push("/admin/kategori");
       router.refresh();
-    } catch (err: any) {
-      setError(err.message);
-      toast.error(err.message);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Gagal menyimpan kategori.";
+      setError(message);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -66,6 +73,22 @@ export function KategoriForm(props: {
           placeholder="Misal: Peraturan Komisi"
           required
         />
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-sm font-semibold text-slate-700">Sub Kategori Dari (Opsional)</label>
+        <select
+          value={values.parentId}
+          onChange={(e) => setValues({ ...values, parentId: e.target.value })}
+          className="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-[#B91C1C] focus:outline-none"
+        >
+          <option value="">(Tidak ada / Kategori utama)</option>
+          {props.parentOptions.map((k) => (
+            <option key={k._id} value={k._id}>
+              {k.nama}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="space-y-1">

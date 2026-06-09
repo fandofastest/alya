@@ -5,6 +5,7 @@ export type KategoriRecord = {
   nama: string;
   slug: string;
   deskripsi?: string;
+  parentId?: string | null;
 };
 
 export type PkpuRecord = {
@@ -16,6 +17,7 @@ export type PkpuRecord = {
   tanggalPenetapan: string;
   statusHukum: StatusHukum;
   kategori: KategoriRecord | string;
+  visibility?: "public" | "private";
   fileUrl: string;
   parentId?: Partial<PkpuRecord> | string | null;
   isActive: boolean;

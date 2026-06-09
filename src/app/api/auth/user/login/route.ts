@@ -1,17 +1,10 @@
 import { NextResponse } from "next/server";
 
-import {
-  ensureDefaultAdmin,
-  setAdminAuthCookie,
-  signAdminToken,
-  verifyAdminCredentials,
-} from "@/lib/auth";
 import { jsonError } from "@/lib/api";
+import { setUserAuthCookie, signUserToken, verifyUserCredentials } from "@/lib/auth";
 import { loginSchema } from "@/validators/auth";
 
 export async function POST(request: Request) {
-  await ensureDefaultAdmin();
-
   const body = await request.json();
   const parseResult = loginSchema.safeParse(body);
   if (!parseResult.success) {
@@ -19,21 +12,21 @@ export async function POST(request: Request) {
   }
 
   const { email, password } = parseResult.data;
-  const admin = await verifyAdminCredentials(email, password);
-  if (!admin) {
+  const user = await verifyUserCredentials(email, password);
+  if (!user) {
     return jsonError("Email atau password salah.", 401);
   }
 
-  const token = signAdminToken({
-    sub: admin._id.toString(),
-    email: admin.email,
-    role: "admin",
+  const token = signUserToken({
+    sub: user._id.toString(),
+    email: user.email,
+    role: "user",
   });
 
   const response = NextResponse.json({
     message: "Login berhasil.",
-    admin: { id: admin._id, email: admin.email, nama: admin.nama },
+    user: { id: user._id, email: user.email, nama: user.nama },
   });
-  setAdminAuthCookie(response, token);
+  setUserAuthCookie(response, token);
   return response;
 }

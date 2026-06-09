@@ -6,13 +6,41 @@ import { PkpuModel } from "@/models/Pkpu";
 
 export default async function AdminPkpuCreatePage() {
   await connectDb();
-  const [kategoriOptions, indukOptions] = await Promise.all([
-    KategoriModel.find().sort({ nama: 1 }).select("_id nama").lean(),
+  const [kategoriDocs, indukOptions] = await Promise.all([
+    KategoriModel.find().sort({ nama: 1 }).select("_id nama parentId").lean(),
     PkpuModel.find({ statusHukum: { $in: ["berlaku", "induk"] } })
       .sort({ tahun: -1, nomor: -1 })
       .select("_id nomor tahun judul")
       .lean(),
   ]);
+
+  const kategoriById = new Map<string, (typeof kategoriDocs)[number]>();
+  for (const k of kategoriDocs) kategoriById.set(k._id.toString(), k);
+
+  const childrenByParent = new Map<string, (typeof kategoriDocs)[number][]>();
+  const roots: (typeof kategoriDocs)[number][] = [];
+  for (const k of kategoriDocs) {
+    const parentKey = k.parentId ? k.parentId.toString() : "";
+    if (!parentKey || !kategoriById.has(parentKey)) {
+      roots.push(k);
+      continue;
+    }
+    const arr = childrenByParent.get(parentKey) ?? [];
+    arr.push(k);
+    childrenByParent.set(parentKey, arr);
+  }
+
+  const ordered: Array<{ _id: string; nama: string }> = [];
+  const pushOrdered = (items: (typeof kategoriDocs)[number][], depth: number) => {
+    const sorted = [...items].sort((a, b) => a.nama.localeCompare(b.nama));
+    for (const item of sorted) {
+      const prefix = "\u00A0\u00A0\u00A0".repeat(depth);
+      ordered.push({ _id: item._id.toString(), nama: `${prefix}${item.nama}` });
+      const children = childrenByParent.get(item._id.toString());
+      if (children && children.length > 0) pushOrdered(children, depth + 1);
+    }
+  };
+  pushOrdered(roots, 0);
 
   const storageConfig = {
     driver: env.STORAGE_DRIVER,
@@ -31,7 +59,7 @@ export default async function AdminPkpuCreatePage() {
         <PkpuForm
           mode="create"
           storageConfig={storageConfig}
-          kategoriOptions={kategoriOptions.map((k) => ({ _id: k._id.toString(), nama: k.nama }))}
+          kategoriOptions={ordered}
           indukOptions={indukOptions.map((p) => ({
             _id: p._id.toString(),
             nomor: p.nomor,

@@ -1,15 +1,17 @@
 import { connectDb } from "@/lib/db";
+import { getViewerSession } from "@/lib/auth";
 import { KategoriModel } from "@/models/Kategori";
 import { PkpuModel } from "@/models/Pkpu";
 
 export async function getKategoriList() {
   await connectDb();
-  return KategoriModel.find().sort({ nama: 1 }).lean();
+  return KategoriModel.find({ parentId: null }).sort({ nama: 1 }).lean();
 }
 
 export async function getLatestPkpu(limit = 8) {
   await connectDb();
-  return PkpuModel.find({ isActive: true })
+  const viewer = await getViewerSession();
+  return PkpuModel.find({ isActive: true, ...(viewer ? {} : { visibility: { $ne: "private" } }) })
     .populate("kategori")
     .sort({ createdAt: -1 })
     .limit(limit)
@@ -18,19 +20,41 @@ export async function getLatestPkpu(limit = 8) {
 
 export async function getPkpuBySlug(slug: string) {
   await connectDb();
-  return PkpuModel.findOne({ slug, isActive: true }).populate("kategori").populate("parentId").lean();
+  const viewer = await getViewerSession();
+  return PkpuModel.findOne({ slug, isActive: true, ...(viewer ? {} : { visibility: { $ne: "private" } }) })
+    .populate("kategori")
+    .populate("parentId")
+    .lean();
 }
 
 export async function getRevisiListByParent(parentId: string) {
   await connectDb();
-  return PkpuModel.find({ parentId, isActive: true }).sort({ tahun: -1, nomor: -1 }).lean();
+  const viewer = await getViewerSession();
+  return PkpuModel.find({ parentId, isActive: true, ...(viewer ? {} : { visibility: { $ne: "private" } }) })
+    .sort({ tahun: -1, nomor: -1 })
+    .lean();
 }
 
 export async function getPkpuByKategoriSlug(slug: string) {
   await connectDb();
   const kategori = await KategoriModel.findOne({ slug }).lean();
   if (!kategori) return { kategori: null, data: [] };
-  const data = await PkpuModel.find({ kategori: kategori._id, isActive: true })
+
+  const kategoriIds: string[] = [kategori._id.toString()];
+  let frontier: string[] = [kategori._id.toString()];
+  while (frontier.length > 0) {
+    const children = await KategoriModel.find({ parentId: { $in: frontier } }).select("_id").lean();
+    const childIds = children.map((c) => c._id.toString());
+    const newIds = childIds.filter((id) => !kategoriIds.includes(id));
+    kategoriIds.push(...newIds);
+    frontier = newIds;
+  }
+
+  const data = await PkpuModel.find({
+    kategori: kategoriIds.length > 1 ? { $in: kategoriIds } : kategori._id,
+    isActive: true,
+    ...((await getViewerSession()) ? {} : { visibility: { $ne: "private" } }),
+  })
     .sort({ tahun: -1, nomor: -1 })
     .lean();
   return { kategori, data };

@@ -21,11 +21,16 @@ export async function POST(request: Request) {
     return jsonError("Ukuran file maksimal 10MB.", 400);
   }
 
+  const getText = (key: string) => {
+    const v = formData.get(key);
+    return typeof v === "string" ? v : undefined;
+  };
+
   const fileUrl = await storePdfFile(file, {
-    nomor: formData.get("nomor"),
-    tahun: formData.get("tahun"),
-    judul: formData.get("judul"),
-    tanggalPenetapan: formData.get("tanggalPenetapan"),
+    nomor: getText("nomor"),
+    tahun: getText("tahun"),
+    judul: getText("judul"),
+    tanggalPenetapan: getText("tanggalPenetapan"),
   });
   return NextResponse.json({ message: "Upload berhasil.", fileUrl }, { status: 201 });
 }

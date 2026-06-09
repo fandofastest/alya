@@ -5,14 +5,15 @@ import {
   ChevronRight,
   Download,
   Eye,
-  Filter,
   FolderOpen,
   Search,
 } from "lucide-react";
+import { Types } from "mongoose";
 import Link from "next/link";
 
 import { EmptyState } from "@/components/public/EmptyState";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { getViewerSession } from "@/lib/auth";
 import { connectDb } from "@/lib/db";
 import { formatTanggalIndonesia } from "@/lib/utils";
 import { KategoriModel } from "@/models/Kategori";
@@ -31,12 +32,25 @@ type SearchParams = {
 export default async function PkpuListPage(props: { searchParams: Promise<SearchParams> }) {
   await connectDb();
   const searchParams = await props.searchParams;
+  const viewer = await getViewerSession();
 
   const filter: Record<string, unknown> = { isActive: true };
   if (searchParams.q) filter.$text = { $search: searchParams.q };
   if (searchParams.tahun) filter.tahun = Number(searchParams.tahun);
   if (searchParams.statusHukum) filter.statusHukum = searchParams.statusHukum;
-  if (searchParams.kategori) filter.kategori = searchParams.kategori;
+  if (!viewer) filter.visibility = { $ne: "private" };
+  if (searchParams.kategori && Types.ObjectId.isValid(searchParams.kategori)) {
+    const kategoriIds: string[] = [searchParams.kategori];
+    let frontier: string[] = [searchParams.kategori];
+    while (frontier.length > 0) {
+      const children = await KategoriModel.find({ parentId: { $in: frontier } }).select("_id").lean();
+      const childIds = children.map((c) => c._id.toString());
+      const newIds = childIds.filter((id) => !kategoriIds.includes(id));
+      kategoriIds.push(...newIds);
+      frontier = newIds;
+    }
+    filter.kategori = kategoriIds.length > 1 ? { $in: kategoriIds } : searchParams.kategori;
+  }
 
   const sortOption: Record<string, 1 | -1> = {};
   if (searchParams.sort === "popular") {
@@ -47,28 +61,16 @@ export default async function PkpuListPage(props: { searchParams: Promise<Search
   }
 
   // Fetch Sidebar Data (Counts)
-  const [pkpuList, kategoriList, yearStats] = await Promise.all([
+  const matchCondition = viewer ? { isActive: true } : { isActive: true, visibility: { $ne: "private" } };
+  const [pkpuList, kategoriDocs, kategoriCounts, yearStats] = await Promise.all([
     PkpuModel.find(filter).populate("kategori").sort(sortOption).limit(50).lean(),
-    KategoriModel.aggregate([
-      {
-        $lookup: {
-          from: "pkpus",
-          localField: "_id",
-          foreignField: "kategori",
-          as: "files",
-        },
-      },
-      {
-        $project: {
-          nama: 1,
-          slug: 1,
-          count: { $size: "$files" },
-        },
-      },
-      { $sort: { nama: 1 } },
+    KategoriModel.find().select("_id nama parentId").lean(),
+    PkpuModel.aggregate([
+      { $match: matchCondition },
+      { $group: { _id: "$kategori", count: { $sum: 1 } } },
     ]),
     PkpuModel.aggregate([
-      { $match: { isActive: true } },
+      { $match: matchCondition },
       { $group: { _id: "$tahun", count: { $sum: 1 } } },
       { $sort: { _id: -1 } },
     ]),
@@ -76,6 +78,44 @@ export default async function PkpuListPage(props: { searchParams: Promise<Search
 
   const currentStatus = searchParams.statusHukum || "";
   const currentSort = searchParams.sort || "";
+
+  const countByKategori = new Map<string, number>();
+  for (const row of kategoriCounts) {
+    if (!row?._id) continue;
+    countByKategori.set(row._id.toString(), row.count ?? 0);
+  }
+
+  const kategoriById = new Map<string, (typeof kategoriDocs)[number]>();
+  for (const k of kategoriDocs) kategoriById.set(k._id.toString(), k);
+
+  const childrenByParent = new Map<string, (typeof kategoriDocs)[number][]>();
+  const roots: (typeof kategoriDocs)[number][] = [];
+  for (const k of kategoriDocs) {
+    const parentKey = k.parentId ? k.parentId.toString() : "";
+    if (!parentKey || !kategoriById.has(parentKey)) {
+      roots.push(k);
+      continue;
+    }
+    const arr = childrenByParent.get(parentKey) ?? [];
+    arr.push(k);
+    childrenByParent.set(parentKey, arr);
+  }
+  const sortByNama = (a: { nama: string }, b: { nama: string }) => a.nama.localeCompare(b.nama);
+  roots.sort(sortByNama);
+  for (const [key, list] of childrenByParent.entries()) {
+    childrenByParent.set(key, [...list].sort(sortByNama));
+  }
+
+  const totalCountMemo = new Map<string, number>();
+  const getTotalCount = (id: string): number => {
+    const cached = totalCountMemo.get(id);
+    if (cached !== undefined) return cached;
+    const own = countByKategori.get(id) ?? 0;
+    const children = childrenByParent.get(id) ?? [];
+    const total = own + children.reduce((sum, c) => sum + getTotalCount(c._id.toString()), 0);
+    totalCountMemo.set(id, total);
+    return total;
+  };
 
   return (
     <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
@@ -97,23 +137,48 @@ export default async function PkpuListPage(props: { searchParams: Promise<Search
             >
               <span>Semua Direktori</span>
             </Link>
-            {kategoriList.map((kat) => (
-              <Link
-                key={kat._id.toString()}
-                href={`/pkpu?kategori=${kat._id.toString()}`}
-                className={clsx(
-                  "flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors hover:bg-slate-50",
-                  searchParams.kategori === kat._id.toString()
-                    ? "bg-red-50 font-bold text-[#B91C1C]"
-                    : "text-slate-600"
-                )}
-              >
-                <span>{kat.nama}</span>
-                <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-500">
-                  {kat.count}
-                </span>
-              </Link>
-            ))}
+            {roots.map((parent) => {
+              const parentId = parent._id.toString();
+              const children = childrenByParent.get(parentId) ?? [];
+              const isParentActive = searchParams.kategori === parentId;
+
+              return (
+                <div key={parentId}>
+                  <Link
+                    href={`/pkpu?kategori=${parentId}`}
+                    className={clsx(
+                      "flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors hover:bg-slate-50",
+                      isParentActive ? "bg-red-50 font-bold text-[#B91C1C]" : "text-slate-600"
+                    )}
+                  >
+                    <span>{parent.nama}</span>
+                    <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-500">
+                      {getTotalCount(parentId)}
+                    </span>
+                  </Link>
+
+                  {children.map((child) => {
+                    const childId = child._id.toString();
+                    const isChildActive = searchParams.kategori === childId;
+                    return (
+                      <Link
+                        key={childId}
+                        href={`/pkpu?kategori=${childId}`}
+                        className={clsx(
+                          "flex items-center justify-between rounded-md py-2 pl-8 pr-3 text-[13px] transition-colors hover:bg-slate-50",
+                          isChildActive ? "bg-red-50 font-bold text-[#B91C1C]" : "text-slate-600"
+                        )}
+                      >
+                        <span>{child.nama}</span>
+                        <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-bold text-slate-500">
+                          {countByKategori.get(childId) ?? 0}
+                        </span>
+                      </Link>
+                    );
+                  })}
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -224,13 +289,27 @@ export default async function PkpuListPage(props: { searchParams: Promise<Search
                 key={item._id.toString()}
                 className="group relative overflow-hidden rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all hover:border-red-200 hover:shadow-md"
               >
+                {(() => {
+                  const kategoriNama =
+                    typeof item.kategori === "object" && item.kategori && "nama" in item.kategori
+                      ? ((item.kategori as { nama?: string }).nama ?? "Umum")
+                      : "Umum";
+                  const viewCount =
+                    typeof (item as { viewCount?: unknown }).viewCount === "number"
+                      ? ((item as { viewCount?: number }).viewCount ?? 0)
+                      : 0;
+                  const downloadCount =
+                    typeof (item as { downloadCount?: unknown }).downloadCount === "number"
+                      ? ((item as { downloadCount?: number }).downloadCount ?? 0)
+                      : 0;
+
+                  return (
+                    <>
                 {/* Item Breadcrumb */}
                 <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#15803d]">
                   <span>Direktori</span>
                   <ChevronRight className="h-3 w-3" />
-                  <span>
-                    {typeof item.kategori === "object" ? (item.kategori as any).nama : "Umum"}
-                  </span>
+                  <span>{kategoriNama}</span>
                 </div>
 
                 {/* Status Timeline Header */}
@@ -251,7 +330,7 @@ export default async function PkpuListPage(props: { searchParams: Promise<Search
                     PKPU Nomor {item.nomor} Tahun {item.tahun}
                   </h3>
                   <p className="mt-1 line-clamp-2 text-sm font-medium leading-relaxed text-slate-600 italic">
-                    "{item.judul}"
+                    &quot;{item.judul}&quot;
                   </p>
                 </Link>
 
@@ -262,11 +341,11 @@ export default async function PkpuListPage(props: { searchParams: Promise<Search
                     <div className="flex items-center gap-3 text-xs text-slate-400">
                       <div className="flex items-center gap-1">
                         <Eye className="h-3.5 w-3.5" />
-                        <span>{(item as any).viewCount || 0}</span>
+                        <span>{viewCount}</span>
                       </div>
                       <div className="flex items-center gap-1">
                         <Download className="h-3.5 w-3.5" />
-                        <span>{(item as any).downloadCount || 0}</span>
+                        <span>{downloadCount}</span>
                       </div>
                     </div>
                   </div>
@@ -278,6 +357,9 @@ export default async function PkpuListPage(props: { searchParams: Promise<Search
                     <Download className="h-4 w-4" />
                   </Link>
                 </div>
+                    </>
+                  );
+                })()}
               </div>
             ))
           )}

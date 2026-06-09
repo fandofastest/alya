@@ -15,6 +15,7 @@ type PkpuFormValues = {
   tanggalPenetapan: string;
   statusHukum: StatusHukum;
   kategori: string;
+  visibility: "public" | "private";
   parentId: string | null;
   isActive: boolean;
   fileUrl: string;
@@ -52,6 +53,7 @@ export function PkpuForm(props: {
       : toDateInputValue(new Date()),
     statusHukum: props.initial?.statusHukum ?? "berlaku",
     kategori: props.initial?.kategori ?? (props.kategoriOptions[0]?._id ?? ""),
+    visibility: props.initial?.visibility ?? "public",
     parentId: props.initial?.parentId ?? null,
     isActive: props.initial?.isActive ?? true,
     fileUrl: props.initial?.fileUrl ?? "",
@@ -134,12 +136,12 @@ export function PkpuForm(props: {
     if (!values.tahun || values.tahun < 1945) return setError("Tahun tidak valid.");
     if (!values.tanggalPenetapan) return setError("Tanggal penetapan wajib diisi.");
 
-    if ((values.statusHukum === "revisi" || values.statusHukum === "dicabut") && !values.parentId) {
-      return setError(`PKPU ${values.statusHukum} wajib memilih PKPU induk sebagai parent.`);
+    if (values.statusHukum === "revisi" && !values.parentId) {
+      return setError("PKPU revisi wajib memilih PKPU induk sebagai parent.");
     }
 
-    if (values.statusHukum === "berlaku" && values.parentId) {
-      return setError("PKPU berlaku (induk) tidak boleh memiliki parent.");
+    if ((values.statusHukum === "berlaku" || values.statusHukum === "dicabut") && values.parentId) {
+      return setError("PKPU ini tidak boleh memiliki parent.");
     }
 
     if (props.mode === "create" && !pdfFile) {
@@ -156,8 +158,9 @@ export function PkpuForm(props: {
         tanggalPenetapan: values.tanggalPenetapan,
         statusHukum: values.statusHukum,
         kategori: values.kategori,
+        visibility: values.visibility,
         fileUrl,
-        parentId: values.statusHukum === "berlaku" ? null : values.parentId,
+        parentId: values.statusHukum === "revisi" ? values.parentId : null,
         isActive: values.isActive,
       };
 
@@ -241,7 +244,7 @@ export function PkpuForm(props: {
             onChange={(e) => {
               const nextStatus = e.target.value as StatusHukum;
               update("statusHukum", nextStatus);
-              if (nextStatus === "berlaku") update("parentId", null);
+              if (nextStatus !== "revisi") update("parentId", null);
             }}
             className="w-full rounded border border-slate-300 px-3 py-2"
           >
@@ -265,10 +268,22 @@ export function PkpuForm(props: {
           </select>
         </label>
 
-        {values.statusHukum === "revisi" || values.statusHukum === "dicabut" ? (
+        <label className="space-y-1 text-sm">
+          <span className="font-semibold text-slate-700">Visibility</span>
+          <select
+            value={values.visibility}
+            onChange={(e) => update("visibility", e.target.value as "public" | "private")}
+            className="w-full rounded border border-slate-300 px-3 py-2"
+          >
+            <option value="public">Public</option>
+            <option value="private">Private</option>
+          </select>
+        </label>
+
+        {values.statusHukum === "revisi" ? (
           <label className="space-y-1 text-sm">
             <span className="font-semibold text-slate-700">
-              {values.statusHukum === "revisi" ? "Revisi dari" : "Mencabut"} (PKPU Induk)
+              Revisi dari (PKPU Induk)
             </span>
             <select
               value={values.parentId ?? ""}

@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
+import { getViewerSession } from "@/lib/auth";
+import { connectDb } from "@/lib/db";
 import { env } from "@/lib/env";
+import { PkpuModel } from "@/models/Pkpu";
 
 export async function GET(
   _request: Request,
@@ -9,6 +12,20 @@ export async function GET(
 
   if (!env.EXTERNAL_UPLOAD_TOKEN) {
     return new Response("Konfigurasi token eksternal belum lengkap.", { status: 500 });
+  }
+
+  await connectDb();
+  const pkpu = await PkpuModel.findOne({ fileUrl: `/api/pkpu/file/${id}` }).select("visibility").lean();
+  if (!pkpu) {
+    return new Response("PKPU tidak ditemukan.", { status: 404 });
+  }
+
+  const isPrivate = (pkpu as { visibility?: string }).visibility === "private";
+  if (isPrivate) {
+    const viewer = await getViewerSession();
+    if (!viewer) {
+      return new Response("PKPU tidak ditemukan.", { status: 404 });
+    }
   }
 
   // URL dasar server kpu fando
@@ -38,7 +55,7 @@ export async function GET(
       headers: {
         "Content-Type": contentType,
         "Content-Disposition": "inline",
-        "Cache-Control": "public, max-age=3600",
+        "Cache-Control": isPrivate ? "private, no-store" : "public, max-age=3600",
       },
     });
   } catch (error) {

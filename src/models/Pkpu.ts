@@ -15,6 +15,7 @@ const pkpuSchema = new Schema(
     tanggalPenetapan: { type: Date, required: true },
     statusHukum: { type: String, enum: ["berlaku", "revisi", "dicabut", "induk"], required: true },
     kategori: { type: Schema.Types.ObjectId, ref: "Kategori", required: true },
+    visibility: { type: String, enum: ["public", "private"], default: "public" },
     fileUrl: { type: String, required: true },
     parentId: { type: Schema.Types.ObjectId, ref: "Pkpu", default: null },
     isActive: { type: Boolean, default: true },
@@ -28,6 +29,7 @@ pkpuSchema.index({ judul: "text" });
 pkpuSchema.index({ tahun: 1 });
 pkpuSchema.index({ statusHukum: 1 });
 pkpuSchema.index({ kategori: 1 });
+pkpuSchema.index({ visibility: 1 });
 pkpuSchema.index({ nomor: 1, tahun: 1 }, { unique: true });
 
 export type Pkpu = InferSchemaType<typeof pkpuSchema>;

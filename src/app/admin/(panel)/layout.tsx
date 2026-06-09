@@ -8,6 +8,7 @@ const navLinks = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/pkpu", label: "PKPU" },
   { href: "/admin/kategori", label: "Kategori" },
+  { href: "/admin/users", label: "User" },
 ];
 
 export default async function AdminPanelLayout({ children }: { children: React.ReactNode }) {

@@ -1,12 +1,17 @@
 import Link from "next/link";
 
+import { getUserSession } from "@/lib/auth";
+import { UserLogoutButton } from "@/components/public/UserLogoutButton";
+
 const links = [
   { href: "/", label: "Beranda" },
   { href: "/pkpu", label: "Direktori" },
   { href: "/bantuan", label: "Bantuan" },
 ];
 
-export function SiteHeader() {
+export async function SiteHeader() {
+  const session = await getUserSession();
+
   return (
     <header className="border-b border-slate-200 bg-white">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4">
@@ -27,6 +32,16 @@ export function SiteHeader() {
               {link.label}
             </Link>
           ))}
+          {session ? (
+            <div className="flex items-center gap-3">
+              <span className="hidden text-sm text-slate-600 md:block">{session.email}</span>
+              <UserLogoutButton />
+            </div>
+          ) : (
+            <Link href="/login" className="rounded bg-[#B91C1C] px-3 py-1.5 text-sm font-semibold text-white">
+              Login
+            </Link>
+          )}
         </nav>
       </div>
     </header>

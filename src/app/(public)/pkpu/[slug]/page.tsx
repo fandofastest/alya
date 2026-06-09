@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import {
   ArrowUpRight,
   BarChart3,
@@ -18,7 +17,6 @@ import {
   getRevisiListByParent,
   incrementPkpuView,
 } from "@/lib/repositories";
-import { formatTanggalIndonesia } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -49,6 +47,15 @@ export default async function PkpuDetailPage(props: { params: Promise<{ slug: st
     pkpu.parentId && typeof pkpu.parentId === "object" && "tahun" in pkpu.parentId
       ? (pkpu.parentId as unknown as { nomor: number; tahun: number; slug: string })
       : null;
+
+  const viewCount =
+    typeof (pkpu as { viewCount?: unknown }).viewCount === "number"
+      ? ((pkpu as { viewCount?: number }).viewCount ?? 0)
+      : 0;
+  const downloadCount =
+    typeof (pkpu as { downloadCount?: unknown }).downloadCount === "number"
+      ? ((pkpu as { downloadCount?: number }).downloadCount ?? 0)
+      : 0;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -220,7 +227,7 @@ export default async function PkpuDetailPage(props: { params: Promise<{ slug: st
                   <div>
                     <div className="text-xs text-slate-500">Dilihat</div>
                     <div className="text-sm font-bold text-slate-800">
-                      {(pkpu as any).viewCount || 0}
+                      {viewCount}
                     </div>
                   </div>
                 </div>
@@ -229,7 +236,7 @@ export default async function PkpuDetailPage(props: { params: Promise<{ slug: st
                   <div>
                     <div className="text-xs text-slate-500">Unduh</div>
                     <div className="text-sm font-bold text-slate-800">
-                      {(pkpu as any).downloadCount || 0}
+                      {downloadCount}
                     </div>
                   </div>
                 </div>
@@ -238,36 +245,36 @@ export default async function PkpuDetailPage(props: { params: Promise<{ slug: st
           </div>
 
           {/* Card: Peraturan Pelaksana Dari / Terkait */}
-          <div className="overflow-hidden rounded-xl border-t-4 border-[#15803d] bg-white shadow-sm ring-1 ring-slate-200">
-            <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50/50 px-5 py-3">
-              <ChevronRight className="h-4 w-4 text-slate-400" />
-              <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700">
-                {pkpu.statusHukum === "revisi" || pkpu.statusHukum === "dicabut"
-                  ? "Mengacu Pada"
-                  : "Peraturan Pelaksana Dari"}
-              </h3>
-            </div>
-            <div className="p-5">
-              {parentPopulated ? (
-                <Link
-                  href={`/pkpu/${parentPopulated.slug}`}
-                  className="group flex items-start gap-3 text-[#B91C1C] hover:text-red-700"
-                >
-                  <div className="mt-1 rounded bg-red-50 p-2 text-[#B91C1C] group-hover:bg-red-100">
-                    <ArrowUpRight className="h-5 w-5" />
+          {pkpu.statusHukum !== "dicabut" && (
+            <div className="overflow-hidden rounded-xl border-t-4 border-[#15803d] bg-white shadow-sm ring-1 ring-slate-200">
+              <div className="flex items-center gap-2 border-b border-slate-100 bg-slate-50/50 px-5 py-3">
+                <ChevronRight className="h-4 w-4 text-slate-400" />
+                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-700">
+                  {pkpu.statusHukum === "revisi" ? "Mengacu Pada" : "Peraturan Pelaksana Dari"}
+                </h3>
+              </div>
+              <div className="p-5">
+                {parentPopulated ? (
+                  <Link
+                    href={`/pkpu/${parentPopulated.slug}`}
+                    className="group flex items-start gap-3 text-[#B91C1C] hover:text-red-700"
+                  >
+                    <div className="mt-1 rounded bg-red-50 p-2 text-[#B91C1C] group-hover:bg-red-100">
+                      <ArrowUpRight className="h-5 w-5" />
+                    </div>
+                    <div className="text-sm font-semibold underline decoration-red-200 underline-offset-4 group-hover:decoration-red-400">
+                      PKPU No {parentPopulated.nomor} Tahun {parentPopulated.tahun}
+                    </div>
+                  </Link>
+                ) : (
+                  <div className="flex items-center gap-2 text-sm text-slate-500 italic">
+                    <Info className="h-4 w-4" />
+                    <span>Tidak ada relasi peraturan induk.</span>
                   </div>
-                  <div className="text-sm font-semibold underline decoration-red-200 underline-offset-4 group-hover:decoration-red-400">
-                    PKPU No {parentPopulated.nomor} Tahun {parentPopulated.tahun}
-                  </div>
-                </Link>
-              ) : (
-                <div className="flex items-center gap-2 text-sm text-slate-500 italic">
-                  <Info className="h-4 w-4" />
-                  <span>Tidak ada relasi peraturan induk.</span>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Revisions List (if any) */}
           {(pkpu.statusHukum === "berlaku" || pkpu.statusHukum === "induk") &&
