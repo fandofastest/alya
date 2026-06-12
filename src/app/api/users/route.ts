@@ -10,7 +10,7 @@ export async function GET() {
   if (!auth.ok) return auth.response;
 
   await connectDb();
-  const users = await UserModel.find().sort({ createdAt: -1 }).select("_id nip nama isActive createdAt").lean();
+  const users = await UserModel.find().sort({ createdAt: -1 }).select("_id nip nama isActive tipe createdAt").lean();
   return NextResponse.json({ data: users });
 }
 
@@ -26,15 +26,21 @@ export async function POST(request: Request) {
   const password = "password" in body ? String((body as { password?: unknown }).password ?? "") : "";
   const isActiveRaw = "isActive" in body ? (body as { isActive?: unknown }).isActive : true;
   const isActive = typeof isActiveRaw === "boolean" ? isActiveRaw : true;
+  const tipeRaw = "tipe" in body ? String((body as { tipe?: unknown }).tipe ?? "pegawai") : "pegawai";
+  const tipe = tipeRaw === "komisioner" ? ("komisioner" as const) : ("pegawai" as const);
 
-  if (!nip.trim()) return jsonError("NIP wajib diisi.", 400);
+  if (!nip.trim()) {
+    return jsonError(tipe === "komisioner" ? "Username wajib diisi." : "NIP wajib diisi.", 400);
+  }
   if (!nama.trim()) return jsonError("Nama wajib diisi.", 400);
   if (password.length < 6) return jsonError("Password minimal 6 karakter.", 400);
 
   await connectDb();
 
   const exists = await UserModel.findOne({ nip: nip.trim() }).select("_id").lean();
-  if (exists) return jsonError("NIP sudah terdaftar.", 400);
+  if (exists) {
+    return jsonError(tipe === "komisioner" ? "Username sudah terdaftar." : "NIP sudah terdaftar.", 400);
+  }
 
   const passwordHash = await bcrypt.hash(password, 10);
   const created = await UserModel.create({
@@ -42,10 +48,11 @@ export async function POST(request: Request) {
     nama: nama.trim(),
     passwordHash,
     isActive,
+    tipe,
   });
 
   return NextResponse.json(
-    { message: "User berhasil dibuat.", data: { id: created._id, nip: created.nip, nama: created.nama, isActive: created.isActive } },
+    { message: "User berhasil dibuat.", data: { id: created._id, nip: created.nip, nama: created.nama, isActive: created.isActive, tipe: created.tipe } },
     { status: 201 }
   );
 }

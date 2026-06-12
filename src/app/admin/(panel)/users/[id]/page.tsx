@@ -26,6 +26,7 @@ export default async function AdminUserEditPage({ params }: { params: Promise<{ 
             nip: user.nip,
             nama: user.nama,
             isActive: user.isActive ?? true,
+            tipe: (user as any).tipe,
           }}
         />
       </section>

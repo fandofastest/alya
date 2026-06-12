@@ -7,6 +7,7 @@ const userSchema = new Schema(
     passwordHash: { type: String, required: true },
     nama: { type: String, required: true, trim: true },
     isActive: { type: Boolean, default: true },
+    tipe: { type: String, enum: ["pegawai", "komisioner"], default: "pegawai" },
   },
   { timestamps: true }
 );

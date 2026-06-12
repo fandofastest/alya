@@ -21,8 +21,12 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   const password = "password" in body ? String((body as { password?: unknown }).password ?? "") : "";
   const isActiveRaw = "isActive" in body ? (body as { isActive?: unknown }).isActive : undefined;
   const isActive = typeof isActiveRaw === "boolean" ? isActiveRaw : undefined;
+  const tipeRaw = "tipe" in body ? String((body as { tipe?: unknown }).tipe ?? "pegawai") : "pegawai";
+  const tipe = tipeRaw === "komisioner" ? ("komisioner" as const) : ("pegawai" as const);
 
-  if (!nip.trim()) return jsonError("NIP wajib diisi.", 400);
+  if (!nip.trim()) {
+    return jsonError(tipe === "komisioner" ? "Username wajib diisi." : "NIP wajib diisi.", 400);
+  }
   if (!nama.trim()) return jsonError("Nama wajib diisi.", 400);
   if (password && password.length < 6) return jsonError("Password minimal 6 karakter.", 400);
 
@@ -32,11 +36,14 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   if (!existing) return jsonError("User tidak ditemukan.", 404);
 
   const other = await UserModel.findOne({ nip: nip.trim(), _id: { $ne: id } }).select("_id").lean();
-  if (other) return jsonError("NIP sudah dipakai user lain.", 400);
+  if (other) {
+    return jsonError(tipe === "komisioner" ? "Username sudah dipakai user lain." : "NIP sudah dipakai user lain.", 400);
+  }
 
   existing.set({
     nip: nip.trim(),
     nama: nama.trim(),
+    tipe,
     ...(isActive === undefined ? {} : { isActive }),
   });
 
@@ -45,7 +52,10 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
   }
 
   await existing.save();
-  return NextResponse.json({ message: "User berhasil diperbarui.", data: { id: existing._id, nip: existing.nip, nama: existing.nama, isActive: existing.isActive } });
+  return NextResponse.json({
+    message: "User berhasil diperbarui.",
+    data: { id: existing._id, nip: existing.nip, nama: existing.nama, isActive: existing.isActive, tipe: (existing as any).tipe },
+  });
 }
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {

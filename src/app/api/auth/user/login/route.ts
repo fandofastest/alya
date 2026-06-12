@@ -11,10 +11,10 @@ export async function POST(request: Request) {
     return jsonError("Data login tidak valid.", 400);
   }
 
-  const { nip, password } = parseResult.data;
-  const user = await verifyUserCredentials(nip, password);
+  const { nip, password, tipe } = parseResult.data;
+  const user = await verifyUserCredentials(nip, password, tipe);
   if (!user) {
-    return jsonError("NIP atau password salah.", 401);
+    return jsonError(tipe === "komisioner" ? "Username atau password salah." : "NIP atau password salah.", 401);
   }
 
   const token = signUserToken({
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
 
   const response = NextResponse.json({
     message: "Login berhasil.",
-    user: { id: user._id, nip: user.nip, nama: user.nama },
+    user: { id: user._id, nip: user.nip, nama: user.nama, tipe: (user as any).tipe },
   });
   setUserAuthCookie(response, token);
   return response;

@@ -7,7 +7,7 @@ import { toast } from "sonner";
 export function UserForm(props: {
   mode: "create" | "edit";
   id?: string;
-  initial?: { nip: string; nama: string; isActive: boolean };
+  initial?: { nip: string; nama: string; isActive: boolean; tipe?: string };
 }) {
   const router = useRouter();
   const [values, setValues] = useState({
@@ -15,6 +15,7 @@ export function UserForm(props: {
     nama: props.initial?.nama ?? "",
     password: "",
     isActive: props.initial?.isActive ?? true,
+    tipe: props.initial?.tipe ?? "pegawai",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +24,7 @@ export function UserForm(props: {
     event.preventDefault();
     setError(null);
 
-    if (!values.nip.trim()) return setError("NIP wajib diisi.");
+    if (!values.nip.trim()) return setError(values.tipe === "komisioner" ? "Username wajib diisi." : "NIP wajib diisi.");
     if (!values.nama.trim()) return setError("Nama wajib diisi.");
     if (props.mode === "create" && values.password.length < 6) return setError("Password minimal 6 karakter.");
     if (props.mode === "edit" && values.password && values.password.length < 6) return setError("Password minimal 6 karakter.");
@@ -37,6 +38,7 @@ export function UserForm(props: {
         nama: values.nama.trim(),
         password: values.password ? values.password : undefined,
         isActive: values.isActive,
+        tipe: values.tipe,
       };
 
       const res = await fetch(endpoint, {
@@ -65,13 +67,43 @@ export function UserForm(props: {
       {error && <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">{error}</div>}
 
       <div className="space-y-1">
-        <label className="text-sm font-semibold text-slate-700">NIP</label>
+        <label className="text-sm font-semibold text-slate-700">Tipe User</label>
+        <div className="flex items-center gap-4 py-1">
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer">
+            <input
+              type="radio"
+              name="tipe"
+              value="pegawai"
+              checked={values.tipe === "pegawai"}
+              onChange={() => setValues({ ...values, tipe: "pegawai" })}
+              className="h-4 w-4 accent-[#B91C1C]"
+            />
+            Pegawai (NIP)
+          </label>
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer">
+            <input
+              type="radio"
+              name="tipe"
+              value="komisioner"
+              checked={values.tipe === "komisioner"}
+              onChange={() => setValues({ ...values, tipe: "komisioner" })}
+              className="h-4 w-4 accent-[#B91C1C]"
+            />
+            Komisioner (Username)
+          </label>
+        </div>
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-sm font-semibold text-slate-700">
+          {values.tipe === "komisioner" ? "Username" : "NIP"}
+        </label>
         <input
           type="text"
           value={values.nip}
           onChange={(e) => setValues({ ...values, nip: e.target.value })}
           className="w-full rounded border border-slate-300 px-3 py-2 text-sm focus:border-[#B91C1C] focus:outline-none"
-          placeholder="Masukkan NIP"
+          placeholder={values.tipe === "komisioner" ? "Masukkan Username" : "Masukkan NIP"}
           required
         />
       </div>

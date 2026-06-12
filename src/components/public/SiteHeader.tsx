@@ -11,8 +11,7 @@ export async function SiteHeader() {
   const links = [
     { href: "/", label: t.nav.home },
     { href: "/pkpu", label: t.nav.directory },
-    { href: "/sk", label: t.nav.sk },
-    { href: "/berita-acara", label: t.nav.beritaAcara },
+    ...(session ? [{ href: "/sk", label: t.nav.sk }] : []),
     { href: "/bantuan", label: t.nav.help },
   ];
 

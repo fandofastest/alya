@@ -14,7 +14,6 @@ export default async function AdminPanelLayout({ children }: { children: React.R
     { href: "/admin", label: t.nav.dashboard },
     { href: "/admin/pkpu", label: "PKPU" },
     { href: "/admin/sk", label: t.nav.sk },
-    { href: "/admin/berita-acara", label: t.nav.beritaAcara },
     { href: "/admin/kategori", label: t.nav.categories },
     { href: "/admin/users", label: t.nav.users },
   ];

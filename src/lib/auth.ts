@@ -86,10 +86,12 @@ export function clearAdminAuthCookie(response: NextResponse) {
   });
 }
 
-export async function verifyUserCredentials(nip: string, password: string) {
+export async function verifyUserCredentials(nip: string, password: string, tipe: string) {
   await connectDb();
   const user = await UserModel.findOne({ nip: nip.trim(), isActive: true });
   if (!user) return null;
+  const userType = (user as any).tipe || "pegawai";
+  if (userType !== tipe) return null;
   const isValid = await bcrypt.compare(password, user.passwordHash);
   if (!isValid) return null;
   return user;

@@ -9,7 +9,7 @@ export function UserDeleteButton({ id, nip }: { id: string; nip: string }) {
   const [isDeleting, setIsDeleting] = useState(false);
 
   async function handleDelete() {
-    if (!confirm(`Apakah Anda yakin ingin menghapus user dengan NIP "${nip}"?`)) return;
+    if (!confirm(`Apakah Anda yakin ingin menghapus user "${nip}"?`)) return;
 
     setIsDeleting(true);
     try {

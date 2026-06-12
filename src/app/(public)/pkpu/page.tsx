@@ -15,6 +15,7 @@ import { EmptyState } from "@/components/public/EmptyState";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { getPublicSession } from "@/lib/auth";
 import { connectDb } from "@/lib/db";
+import { getI18n } from "@/lib/i18n-server";
 import { formatTanggalIndonesia } from "@/lib/utils";
 import { KategoriModel } from "@/models/Kategori";
 import { PkpuModel } from "@/models/Pkpu";
@@ -33,6 +34,7 @@ export default async function PkpuListPage(props: { searchParams: Promise<Search
   await connectDb();
   const searchParams = await props.searchParams;
   const viewer = await getPublicSession();
+  const { t } = await getI18n();
 
   const filter: Record<string, unknown> = { isActive: true };
   if (searchParams.q) filter.$text = { $search: searchParams.q };
@@ -125,7 +127,7 @@ export default async function PkpuListPage(props: { searchParams: Promise<Search
         <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
           <div className="flex items-center gap-2 border-b-2 border-[#15803d] bg-slate-50 px-4 py-3">
             <FolderOpen className="h-4 w-4 text-slate-500" />
-            <h3 className="text-sm font-bold text-slate-700">Direktori</h3>
+            <h3 className="text-sm font-bold text-slate-700">{t.nav.directory}</h3>
           </div>
           <div className="p-2">
             <Link
@@ -135,7 +137,7 @@ export default async function PkpuListPage(props: { searchParams: Promise<Search
                 !searchParams.kategori ? "bg-red-50 font-bold text-[#B91C1C]" : "text-slate-600"
               )}
             >
-              <span>Semua Direktori</span>
+              <span>{t.pkpu.allDirectory}</span>
             </Link>
             {roots.map((parent) => {
               const parentId = parent._id.toString();
@@ -307,7 +309,7 @@ export default async function PkpuListPage(props: { searchParams: Promise<Search
                     <>
                 {/* Item Breadcrumb */}
                 <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#15803d]">
-                  <span>Direktori</span>
+                  <span>{t.nav.directory}</span>
                   <ChevronRight className="h-3 w-3" />
                   <span>{kategoriNama}</span>
                 </div>

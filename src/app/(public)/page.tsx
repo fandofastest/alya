@@ -3,6 +3,7 @@ import { FileText, BookOpen, Layers, Clock, ArrowRight } from "lucide-react";
 
 import { EmptyState } from "@/components/public/EmptyState";
 import { StatusBadge } from "@/components/ui/StatusBadge";
+import { getPublicSession } from "@/lib/auth";
 import { getI18n } from "@/lib/i18n-server";
 import { formatTanggalIndonesia } from "@/lib/utils";
 import { getKategoriList, getLatestPkpu } from "@/lib/repositories";
@@ -12,7 +13,11 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const { locale, t } = await getI18n();
-  const [latestPkpu, kategori] = await Promise.all([getLatestPkpu(6), getKategoriList()]);
+  const [latestPkpu, kategori, session] = await Promise.all([
+    getLatestPkpu(6),
+    getKategoriList(),
+    getPublicSession(),
+  ]);
 
   return (
     <div className="space-y-16 pb-20">
@@ -96,38 +101,29 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="space-y-6 px-4">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-slate-900">{t.home.featuredSections}</h2>
-          <p className="mt-2 text-slate-600">{t.home.featuredSectionsDesc}</p>
-        </div>
-        <div className="mx-auto grid max-w-4xl grid-cols-1 gap-4 md:grid-cols-2">
-          <Link
-            href="/sk"
-            className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition-all hover:-translate-y-1 hover:shadow-xl hover:ring-red-500"
-          >
-            <div className="space-y-3">
-              <div className="inline-block rounded-lg bg-slate-50 p-2 text-slate-600">
-                <FileText size={20} />
+      {/* Featured Sections (Keputusan) - Only show when logged in */}
+      {session && (
+        <section className="space-y-6 px-4">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-slate-900">{t.home.featuredSections}</h2>
+            <p className="mt-2 text-slate-600">{t.home.featuredSectionsDesc}</p>
+          </div>
+          <div className="mx-auto max-w-md">
+            <Link
+              href="/sk"
+              className="block rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition-all hover:-translate-y-1 hover:shadow-xl hover:ring-red-500"
+            >
+              <div className="space-y-3 text-center">
+                <div className="mx-auto inline-block rounded-lg bg-slate-50 p-2 text-slate-600">
+                  <FileText size={20} />
+                </div>
+                <h3 className="font-bold text-slate-900">{t.documents.sk.long}</h3>
+                <p className="text-sm text-slate-500">{t.home.skDesc}</p>
               </div>
-              <h3 className="font-bold text-slate-900">{t.documents.sk.long}</h3>
-              <p className="text-sm text-slate-500">{t.home.skDesc}</p>
-            </div>
-          </Link>
-          <Link
-            href="/berita-acara"
-            className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 transition-all hover:-translate-y-1 hover:shadow-xl hover:ring-red-500"
-          >
-            <div className="space-y-3">
-              <div className="inline-block rounded-lg bg-slate-50 p-2 text-slate-600">
-                <FileText size={20} />
-              </div>
-              <h3 className="font-bold text-slate-900">{t.documents["berita-acara"].long}</h3>
-              <p className="text-sm text-slate-500">{t.home.beritaAcaraDesc}</p>
-            </div>
-          </Link>
-        </div>
-      </section>
+            </Link>
+          </div>
+        </section>
+      )}
 
       {/* PKPU Terbaru Section */}
       <section className="space-y-6 px-4">

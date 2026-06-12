@@ -6,6 +6,7 @@ export const adminLoginSchema = z.object({
 });
 
 export const userLoginSchema = z.object({
-  nip: z.string().trim().min(5),
+  nip: z.string().trim().min(4),
   password: z.string().min(6),
+  tipe: z.enum(["pegawai", "komisioner"]).default("pegawai"),
 });

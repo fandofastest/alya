@@ -31,7 +31,8 @@ export default async function AdminUsersPage() {
           <table className="min-w-full divide-y divide-slate-200 text-sm text-left">
             <thead className="bg-slate-50 font-semibold text-slate-700">
               <tr>
-                    <th className="px-6 py-4">NIP</th>
+                <th className="px-6 py-4">Tipe</th>
+                <th className="px-6 py-4">NIP / Username</th>
                 <th className="px-6 py-4">Nama</th>
                 <th className="px-6 py-4">Status</th>
                 <th className="px-6 py-4">Dibuat</th>
@@ -41,13 +42,18 @@ export default async function AdminUsersPage() {
             <tbody className="divide-y divide-slate-100 bg-white">
               {users.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-10 text-center text-slate-500 italic">
+                  <td colSpan={6} className="px-6 py-10 text-center text-slate-500 italic">
                     Belum ada user yang dibuat.
                   </td>
                 </tr>
               ) : (
                 users.map((u) => (
                   <tr key={u._id.toString()} className="hover:bg-slate-50">
+                    <td className="px-6 py-4">
+                      <span className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold uppercase text-slate-600">
+                        {(u as any).tipe || "pegawai"}
+                      </span>
+                    </td>
                     <td className="px-6 py-4 text-slate-900 font-medium">{u.nip}</td>
                     <td className="px-6 py-4 text-slate-700">{u.nama}</td>
                     <td className="px-6 py-4">
